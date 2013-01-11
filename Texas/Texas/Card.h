@@ -5,7 +5,8 @@
 
 class Card {
 public:
-	enum Suit { club, diamond, heart, spade };
+	enum Suit { EMPTY, club, diamond, heart, spade };
+	Card();
 	Card(int value, Suit suit);
 	inline int getValue() { return value; }
 	inline Suit getSuit() { return suit; }
