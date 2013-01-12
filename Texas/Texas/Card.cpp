@@ -12,7 +12,7 @@ Card::Card() {
 	suit = EMPTY;
 }
 
-Card::Card(int value, Suit suit) {
+Card::Card(const int value,const Suit suit) {
 
 	assert(value > 0 && value <= 13);
 	assert(suit == Card::club || suit == Card::diamond || suit == Card::heart || suit == Card::spade);

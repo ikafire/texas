@@ -7,7 +7,7 @@ class Card {
 public:
 	enum Suit { EMPTY, club, diamond, heart, spade };
 	Card();
-	Card(int value, Suit suit);
+	Card(const int value, const Suit suit);
 	inline int getValue() { return value; }
 	inline Suit getSuit() { return suit; }
 	std::string toString();

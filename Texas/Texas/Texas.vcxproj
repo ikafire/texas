@@ -62,14 +62,19 @@
   <ItemGroup>
     <ClInclude Include="Card.h" />
     <ClInclude Include="Deck.h" />
-    <ClInclude Include="TexasComPlayer.h" />
-    <ClInclude Include="TexasGame.h" />
-    <ClInclude Include="TexasHumanPlayer.h" />
-    <ClInclude Include="TexasPlayer.h" />
+    <ClInclude Include="ComPlayer.h" />
+    <ClInclude Include="Holdem.h" />
+    <ClInclude Include="HumanPlayer.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Card.cpp" />
+    <ClCompile Include="ComPlayer.cpp" />
     <ClCompile Include="Deck.cpp" />
+    <ClCompile Include="HumanPlayer.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Holdem.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

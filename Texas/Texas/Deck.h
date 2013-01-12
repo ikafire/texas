@@ -14,7 +14,7 @@ public:
 private:
 	std::vector<Card> cardSet;
 	std::vector<bool> isTaken;	//used to specify if certain card is taken
-	const static int numOfCards = 52;
+	const static int NUMOFCARDS = 52;
 	bool isEmpty();
 };
 

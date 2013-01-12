@@ -21,16 +21,16 @@
     <ClInclude Include="Deck.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="TexasGame.h">
+    <ClInclude Include="Holdem.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="TexasPlayer.h">
+    <ClInclude Include="ComPlayer.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="TexasHumanPlayer.h">
+    <ClInclude Include="HumanPlayer.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
-    <ClInclude Include="TexasComPlayer.h">
+    <ClInclude Include="Player.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>
@@ -39,6 +39,21 @@
       <Filter>原始程式檔</Filter>
     </ClCompile>
     <ClCompile Include="Deck.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="Holdem.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="HumanPlayer.cpp">
+      <Filter>原始程式檔</Filter>
+    </ClCompile>
+    <ClCompile Include="ComPlayer.cpp">
       <Filter>原始程式檔</Filter>
     </ClCompile>
   </ItemGroup>

@@ -32,7 +32,7 @@ Deck::Deck() {
 	}
 	srand(time(0));
 
-	assert(cardSet.size()==numOfCards && isTaken.size()==numOfCards);
+	assert(cardSet.size()==NUMOFCARDS && isTaken.size()==NUMOFCARDS);
 }
 
 void Deck::reset() {
@@ -50,7 +50,7 @@ Card Deck::nextCard() {
 
 	int nextPos;
 	do {
-		nextPos = rand()%numOfCards;
+		nextPos = rand()%NUMOFCARDS;
 	} while (isTaken[nextPos]);	//if the card in generated position is taken, generate another one
 
 	isTaken[nextPos] = true;
@@ -58,7 +58,7 @@ Card Deck::nextCard() {
 }
 
 bool Deck::isEmpty() {
-	for (vector<bool>::iterator iter = isTaken.begin(); iter != isTaken.end(); ++iter) {
+	for (vector<bool>::const_iterator iter = isTaken.begin(); iter != isTaken.end(); ++iter) {
 		if (*iter==false) {
 			return false;
 		}
