@@ -5,12 +5,13 @@
 
 class Card {
 public:
-	enum Suit { EMPTY, club, diamond, heart, spade };
+	enum Suit { EMPTY, Club, Diamond, Heart, Spade };
 	Card();
 	Card(const int value, const Suit suit);
-	inline int getValue() { return value; }
-	inline Suit getSuit() { return suit; }
-	std::string toString();
+	std::string toString() const;
+
+	int getValue() const { return value; }
+	Suit getSuit() const { return suit; }
 private:
 	int value;
 	Suit suit;

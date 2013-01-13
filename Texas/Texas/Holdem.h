@@ -13,9 +13,9 @@ typedef unsigned player_num;
 
 class Holdem {
 public:
+	const static player_num MIN_PLAYER = 2;
+	const static player_num MAX_PLAYER = 9;
 	void run();
-	const static player_num MINPLAYER = 2;
-	const static player_num MAXPLAYER = 9;
 private:
 	Deck deck;
 	std::vector<Player> players;
@@ -23,17 +23,22 @@ private:
 	money pot;
 	money sBlind;
 	money bBlind;
-	money currentBet;
-	money minRaise;
 	player_num numOfPlayers;
 	player_num dealer;
-	player_num lastRaise;
+	player_num humanPos;
 	bool allowAllIn;
 	unsigned roundNum;
 
-	void setParams(player_num &humanPos, money &budget); //console only
-	void constructPlayers(const player_num humanPos, const money budget);
+	void constructPlayers(const money budget);
 	void startGame();
+	//functions below are console-only
+	bool setParams(money &budget);
+	void preFlop();
+	void flop();
+	void turn();
+	void river();
+	bool showDown();
+	void betting(const player_num startPos, money minRaise);
 };
 
 #endif

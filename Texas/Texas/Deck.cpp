@@ -15,15 +15,15 @@ using std::time;
 #include "Deck.h"
 #include "Card.h"
 
-Deck::Deck() {
+Deck::Deck() : cardSet(NUM_OF_CARDS) {
 	for (int s=1; s<=4; ++s) {
 		for (int v=1; v<=13; ++v) {
 			Card::Suit suit;
 			switch (s) {
-			case 1: suit = Card::club; break;
-			case 2: suit = Card::diamond; break;
-			case 3: suit = Card::heart; break;
-			case 4: suit = Card::spade; break;
+			case 1: suit = Card::Club; break;
+			case 2: suit = Card::Diamond; break;
+			case 3: suit = Card::Heart; break;
+			case 4: suit = Card::Spade; break;
 			}
 			Card c(v, suit);
 			cardSet.push_back(c);
@@ -31,39 +31,32 @@ Deck::Deck() {
 		}
 	}
 	srand(time(0));
+	cardDealt = 0;
 
-	assert(cardSet.size()==NUMOFCARDS && isTaken.size()==NUMOFCARDS);
+	assert(cardSet.size()==NUM_OF_CARDS && isTaken.size()==NUM_OF_CARDS);
 }
 
 void Deck::reset() {
 	for (vector<bool>::iterator iter = isTaken.begin(); iter != isTaken.end(); ++iter) {
 		*iter = false;
 	}
+	cardDealt = 0;
 }
 
-//Warning: if you call nextCard() more than 52 times without calling reset(), it will loop forever (or throw exception when in debug mode)
+//Warning: if you call nextCard() more than 52 times without calling reset(), it will throw exception
 Card Deck::nextCard() {
-
-	assert(!isEmpty());
-	//when flag NDEBUG is not defined, it will check if deck is empty everytime when nextCard() is called
-	//if deck is empty while nextCard is called, it will throw an exception
+	if (cardDealt >= NUM_OF_CARDS) {
+		throw new std::exception("ERROR: more than 52 cards are dealt.");
+	}
 
 	int nextPos;
 	do {
-		nextPos = rand()%NUMOFCARDS;
+		nextPos = rand() % NUM_OF_CARDS;
 	} while (isTaken[nextPos]);	//if the card in generated position is taken, generate another one
 
 	isTaken[nextPos] = true;
+	++cardDealt;
 	return cardSet[nextPos];
-}
-
-bool Deck::isEmpty() {
-	for (vector<bool>::const_iterator iter = isTaken.begin(); iter != isTaken.end(); ++iter) {
-		if (*iter==false) {
-			return false;
-		}
-	}
-	return true;
 }
 
 //#include <iostream>

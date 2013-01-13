@@ -63,6 +63,7 @@
     <ClInclude Include="Card.h" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="ComPlayer.h" />
+    <ClInclude Include="GameStatus.h" />
     <ClInclude Include="Holdem.h" />
     <ClInclude Include="HumanPlayer.h" />
     <ClInclude Include="Player.h" />
@@ -71,6 +72,7 @@
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="ComPlayer.cpp" />
     <ClCompile Include="Deck.cpp" />
+    <ClCompile Include="Holdem_Console_Only.cpp" />
     <ClCompile Include="HumanPlayer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Holdem.cpp" />

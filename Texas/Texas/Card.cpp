@@ -13,45 +13,46 @@ Card::Card() {
 }
 
 Card::Card(const int value,const Suit suit) {
-
-	assert(value > 0 && value <= 13);
-	assert(suit == Card::club || suit == Card::diamond || suit == Card::heart || suit == Card::spade);
 	//check if card is invalid in debug mode
+	assert(value > 0 && value <= 13);
+	assert(suit == Card::Club || suit == Card::Diamond || suit == Card::Heart || suit == Card::Spade);
 
 	this->value = value;
 	this->suit = suit;
 }
 
-string Card::toString() {
+string Card::toString() const {
 	stringstream sstr;
-	
+
 	switch (suit) {
-	case club:
+	case Club:
 		sstr << 'C';
 		break;
-	case diamond:
+	case Diamond:
 		sstr << 'D';
 		break;
-	case heart:
+	case Heart:
 		sstr << 'H';
 		break;
-	case spade:
+	case Spade:
 		sstr << 'S';
 		break;
 	default:
-		sstr << "ERROR";
-		break;
+		throw new std::exception("ERROR: toString() called on empty Card");
 	}
-	sstr << value;
+
+	if (value >=2 && value <= 10) {
+		sstr << value;
+	} else {
+		switch (value) {
+		case 1:  sstr << 'A'; break;
+		case 11: sstr << 'J'; break;
+		case 12: sstr << 'Q'; break;
+		case 13: sstr << 'K'; break;
+		default:
+			throw new std::exception("ERROR: Card value out of range");
+		}
+	}
 
 	return sstr.str();
 }
-
-//#include <iostream>
-//
-//int main() {
-//	Card c1(1,Card::diamond), c2;
-//	std::cout << c1.toString() << std::endl << c2.toString() << std::endl;
-//	std::cout << c1.getSuit();
-//	system("pause");
-//}
