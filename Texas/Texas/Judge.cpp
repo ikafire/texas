@@ -81,14 +81,14 @@ PokerHand Judge::determineHand(Card (&cards)[7] )
 	if (maxCount == 4)
 	{
 		pickHand(cards, pickList, PokerHand::fourOfAKind, valueCount);
-		PokerHand fourOfAKind(pickList);
+		PokerHand fourOfAKind(pickList, PokerHand::fourOfAKind);
 		return fourOfAKind;
 	}
 
 	if (maxCount == 3 && (secondCount == 3 || secondCount == 2) )
 	{
 		pickHand(cards, pickList, PokerHand::fullHouse, valueCount);
-		PokerHand fullHouse(pickList);
+		PokerHand fullHouse(pickList, PokerHand::fullHouse);
 		return fullHouse;
 	}
 
@@ -108,7 +108,7 @@ PokerHand Judge::determineHand(Card (&cards)[7] )
 			insert = cards[next];
 			int moveItem = next;
 
-			while ( (moveItem > 0) && (cards[moveItem - 1].getValue() > cards[moveItem].getValue() ) )
+			while ( (moveItem > 0) && (cards[moveItem - 1].getValue() > insert.getValue() ) )
 			{
 				cards[moveItem] = cards[moveItem - 1];
 				moveItem--;
@@ -121,7 +121,7 @@ PokerHand Judge::determineHand(Card (&cards)[7] )
 		if(s)
 		{
 			pickHand(cards, pickList, PokerHand::straight, valueCount,theSuit,sValue);
-			PokerHand straight(pickList);
+			PokerHand straight(pickList, PokerHand::straight);
 			return straight;
 		}
 		else
@@ -130,24 +130,24 @@ PokerHand Judge::determineHand(Card (&cards)[7] )
 			{
 				//此處的maxValue代表三條的數字,和前面sValue的意義不同
 				pickHand(cards, pickList, PokerHand::threeOfAKind, valueCount,theSuit,maxValue);
-				PokerHand threeOfAKind(pickList);
+				PokerHand threeOfAKind(pickList, PokerHand::threeOfAKind);
 				return threeOfAKind;
 			}
 			if (maxCount == 2 && secondCount == 2)
 			{
 				pickHand(cards, pickList, PokerHand::twoPair, valueCount, theSuit);
-				PokerHand twoPair(pickList);
+				PokerHand twoPair(pickList, PokerHand::twoPair);
 				return twoPair;
 			}
 			if (maxCount == 2 && secondCount == 1)
 			{
 				pickHand(cards, pickList, PokerHand::onePair, valueCount, theSuit, maxValue);
-				PokerHand onePair(pickList);
+				PokerHand onePair(pickList, PokerHand::onePair);
 				return onePair;
 			}
 
 			pickHand(cards, pickList, PokerHand::highCard, valueCount);
-			PokerHand highCard(pickList);
+			PokerHand highCard(pickList, PokerHand::highCard);
 			return highCard;
 		}
 	}//end if(!boolSuit)
@@ -176,7 +176,7 @@ PokerHand Judge::determineHand(Card (&cards)[7] )
 			pickList[4] = suitSet[suitSet.size() - 4];
 			
 			pickHand(cards,pickList, PokerHand::royalStraightFlush, valueCount, theSuit);
-			PokerHand royalStraightFlush(pickList);
+			PokerHand royalStraightFlush(pickList,PokerHand::royalStraightFlush);
 			return royalStraightFlush;
 		}
 		/*
@@ -194,7 +194,7 @@ PokerHand Judge::determineHand(Card (&cards)[7] )
 				pickList[j] = suitSet[index - j];
 
 			pickHand(cards, pickList, PokerHand::straightFlush, valueCount,theSuit);
-			PokerHand straightFlush(pickList);
+			PokerHand straightFlush(pickList,PokerHand::straightFlush);
 			return straightFlush;
 		}
 		/*
@@ -221,7 +221,7 @@ PokerHand Judge::determineHand(Card (&cards)[7] )
 				pickList[4] = suitSet[suitSet.size() - 5];
 			}
 			pickHand(cards, pickList, PokerHand::flush, valueCount, theSuit);
-			PokerHand flush(pickList);
+			PokerHand flush(pickList, PokerHand::flush);
 			return flush;
 		}
 	}
@@ -252,7 +252,7 @@ void Judge::pickHand(Card (&cards)[7], Card (&pickList)[5], const int handType, 
 		{
 			bool sferr = false; 
 			for (int i = 1; i <= 4; i++)
-				if (pickList[i].getValue() != pickList[i-1].getValue() + 1 )
+				if (pickList[i].getValue() != pickList[i-1].getValue() - 1 )
 					sferr = true;
 
 			if (theSuit == 0 || sferr)
@@ -326,13 +326,22 @@ void Judge::pickHand(Card (&cards)[7], Card (&pickList)[5], const int handType, 
 			int vTwo = 0;
 			if (countThree == 2)
 			{
-				vThree = valueThree[1];
-				vTwo = valueThree[0];
+				if (valueThree[0] != 1)
+				{
+					vThree = valueThree[1];
+					vTwo = valueThree[0];
+				}
+				else
+				{
+					vThree = valueThree[0];
+					vTwo = valueThree[1];
+				}
+
 			}
 			else if (countTwo == 2)
 			{
 				vThree = valueThree[0];
-				vTwo = valueTwo[1];
+				vTwo = (valueTwo[0] == 1 ? valueTwo[0] : valueTwo[1]);
 			}
 			else
 			{
@@ -529,10 +538,10 @@ void Judge::pickHand(Card (&cards)[7], Card (&pickList)[5], const int handType, 
 					indexH++;
 				}
 			}
-			if (sValue != 1)
+			if (valueCount[1] == 1)
 			{
-				pickList[3] = pickList[2];
 				pickList[4] = pickList[3];
+				pickList[3] = pickList[2];
 				pickList[2] = cards[0];
 			}
 			break;
@@ -583,7 +592,7 @@ void Judge::pickHand(Card (&cards)[7], Card (&pickList)[5], const int handType, 
 先把同花色的排取出來做一個subset,再sort subset從1排到13,
 計算最大連續數字長度,分成Royal, straight flush, flush三種
 */
-int Judge::checkFlushType(Card (&cards)[7], const int theSuit, vector<Card>& suitSet, int& sValue)
+int Judge::checkFlushType(Card (&cards)[7],int theSuit, vector<Card> &suitSet, int& sValue)
 {
 	int flushType = 0;
 
@@ -644,7 +653,7 @@ int Judge::checkFlushType(Card (&cards)[7], const int theSuit, vector<Card>& sui
 sLength == 0 if 沒有King(13)
 maxLength == 0 if 連續不滿5張
 
-if (sLength >= 4 && 有Ace) -> 10JQKA straight
+if (sLength >= 4 && 有Ace) -> AKQJ10 straight
 else if (maxLength >= 5) -> Straight
 else 沒有straight
 */

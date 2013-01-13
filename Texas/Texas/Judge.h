@@ -1,14 +1,17 @@
 #ifndef JUDGE_H
 #define JUDGE_H
 
+#include <vector>
+using std::vector;
 #include "PokerHand.h"
 #include "Card.h"
+
 
 class Judge
 {
 public:
 	static PokerHand determineHand(Card (&cards)[7]);
-	static int checkFlushType(Card (&cards)[7], const int theSuit, vector<Card>& suitSet, int& sValue);
+	static int checkFlushType (Card (&cards)[7], int theSuit, vector<Card> &suitSet, int& sValue);
 	static bool checkStraight(const int (&valueCount)[14], int& sValue);
 
 private:

@@ -1,6 +1,7 @@
 #ifndef POKERHAND_H
 #define POKERHAND_H
 
+#include <string>
 #include "Card.h"
 
 class PokerHand
@@ -18,10 +19,21 @@ public:
 	static const int onePair = 2;
 	static const int highCard = 1;
 
-	PokerHand(const Card (&pickList)[5] );
+	PokerHand(const Card (&pickList)[5],const int);
 	int getOrder() const;
 
+	bool operator== (PokerHand& h);
+	bool operator!= (PokerHand& h) {return !(h == (*this));}
+	bool operator> (PokerHand& h) ;
+	bool operator>= (PokerHand& h) {return (h > (*this) || h == (*this)); }
+	bool operator< (PokerHand& h) {return !(h >= (*this) ); }
+	bool operator<=(PokerHand& h) {return !(h > (*this));}
+
+	std::string toString();
+
+
 private:
+	void sortSuit();
 	int order;
 	Card hand[5]; 
 };
