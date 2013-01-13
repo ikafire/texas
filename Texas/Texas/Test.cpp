@@ -1,5 +1,6 @@
 #include <iostream>
 using std::cout;
+using std::cin;
 using std::endl;
 #include <cstdlib>
 using std::rand;
@@ -11,7 +12,70 @@ using std::time;
 #include "Judge.h"
 #include "PokerHand.h"
 
+void randomTest();
+void customTest();
+
 int main()
+{
+	int mode = 1;
+	cout<<"Test mode (1:custom, 2: random): ";
+	cin>>mode;
+
+	if (mode == 2)
+		randomTest();
+	else if (mode == 1)
+		customTest();
+
+	system("pause");
+	return 0;
+}
+
+void customTest()
+{
+	Card cardSet[7];
+	cardSet[0] = Card(1,Card::club);
+	cardSet[1] = Card(1,Card::heart);
+	cardSet[2] = Card(13,Card::club);
+	cardSet[3] = Card(13,Card::diamond);
+	cardSet[4] = Card(13,Card::heart);
+	cardSet[5] = Card(3,Card::club);
+	cardSet[6] = Card(13,Card::spade);
+
+	Card otherSet[7];
+	otherSet[0] = Card(5,Card::club);
+	otherSet[1] = Card(5,Card::spade);
+	otherSet[2] = Card(1,Card::heart);
+	otherSet[3] = Card(1,Card::spade);
+	otherSet[4] = Card(1,Card::diamond);
+	otherSet[5] = Card(10,Card::club);
+	otherSet[6] = Card(1,Card::club);
+
+	for (int i = 0; i < 7; i++)
+		cout<<cardSet[i].toString()<<' ';
+	cout<<endl;
+
+	PokerHand result = Judge::determineHand(cardSet);
+	cout<<result.toString()<<endl;
+
+	for (int i = 0; i < 7; i++)
+		cout<<otherSet[i].toString()<<' ';
+	cout<<endl;
+
+	PokerHand resultTwo = Judge::determineHand(otherSet);
+	cout<<resultTwo.toString()<<endl;
+
+	if (result == resultTwo)
+		cout<<"deuce!"<<endl;
+	else if (result < resultTwo)
+		cout<<"The second card set is higher ranked."<<endl;
+	else if (result > resultTwo)
+		cout<<"The first card set is higher ranked."<<endl;
+
+
+	return;
+}
+
+void randomTest()
 {
 	srand(time(0));
 
@@ -70,7 +134,6 @@ int main()
 		cout<<"The second card set is higher ranked."<<endl;
 	else if (result > resultTwo)
 		cout<<"The first card set is higher ranked."<<endl;
-		
-	system("pause");
-	return 0;
+
+	return;
 }

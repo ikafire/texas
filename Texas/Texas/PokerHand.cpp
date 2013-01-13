@@ -23,11 +23,12 @@ int PokerHand::getOrder() const
 void PokerHand::sortSuit()
 {
 	for (int i = 0; i <=3; i++)
-		if (hand[i].getValue() == hand[i+1].getValue() && hand[i].getSuit() < hand[i+1].getSuit())
+		for (int j = 1; i + j < 5; j++)
+		if (hand[i].getValue() == hand[i+j].getValue() && hand[i].getSuit() < hand[i+j].getSuit())
 		{
 			Card temp = hand[i];
-			hand[i] = hand[i+1];
-			hand[i+1] = temp;
+			hand[i] = hand[i+j];
+			hand[i+j] = temp;
 		}
 }
 
@@ -163,60 +164,129 @@ bool PokerHand::operator>(PokerHand& h)
 	case straightFlush:
 		return (*this).hand[0].getValue() > h.hand[0].getValue();
 	case fourOfAKind:
-		{
-			if ((*this).hand[0].getValue() != h.hand[0].getValue())
-				return (*this).hand[0].getValue() > h.hand[0].getValue();
-			else
-				return (*this).hand[4].getValue() > h.hand[4].getValue();
-		}
 	case fullHouse:
 		{
 			if ((*this).hand[0].getValue() != h.hand[0].getValue())
-				return (*this).hand[0].getValue() > h.hand[0].getValue();
+			{
+				bool f = false;
+				if (h.hand[0].getValue() == 1)
+					f = false;
+				else if ((*this).hand[0].getValue() == 1)
+					f =true;
+				else 
+					f = (*this).hand[0].getValue() > h.hand[0].getValue();
+
+				return f;
+			}
+			else if ((*this).hand[4].getValue() != h.hand[4].getValue())
+			{
+				bool f = false;
+				if (h.hand[4].getValue() == 1)
+					f = false;
+				else if ((*this).hand[4].getValue() == 1)
+					f = true;
+				else
+					f = (*this).hand[4].getValue() > h.hand[4].getValue();
+				
+				return f;
+			}
 			else
-				return (*this).hand[4].getValue() > h.hand[4].getValue();
+				return false;
 		}
 	case flush:
 		{
-			for (int i = 0; i <= 4; i++)
-			if ((*this).hand[i].getValue() != h.hand[i].getValue())
-				return ((*this).hand[i].getValue() > h.hand[i].getValue());
-			
+			if ((*this).hand[0].getValue() != h.hand[0].getValue())
+			{
+				if ((*this).hand[0].getValue() == 1)
+					return true;
+				else if (h.hand[0].getValue() == 1)
+					return false;
+				else
+					return (*this).hand[0].getValue() > h.hand[0].getValue();
+			}
+
+			else
+				for (int i = 1; i <= 4; i++)
+					if ((*this).hand[i].getValue() != h.hand[i].getValue())
+						return ((*this).hand[i].getValue() > h.hand[i].getValue());
+
 			return false;
 		}
 	case straight:
 		return (*this).hand[4].getValue() > h.hand[4].getValue();
 	case threeOfAKind:
 		{
-			if ((*this).hand[0].getValue() != h.hand[0].getValue())
-				return (*this).hand[0].getValue() > h.hand[0].getValue();
-			if ((*this).hand[3].getValue() != h.hand[3].getValue())
-				return (*this).hand[3].getValue() > h.hand[3].getValue();
+			for (int i = 0; i <= 4; i++)
+			{
+				if (i == 1 || i == 2)
+					continue;
 
-			return (*this).hand[4].getValue() > h.hand[4].getValue(); 
+				if ((*this).hand[i].getValue() != h.hand[i].getValue())
+				{
+					if ((*this).hand[i].getValue() == 1)
+						return true;
+					else if (h.hand[i].getValue() == 1)
+						return false;
+					else
+						return (*this).hand[i].getValue() > h.hand[i].getValue();
+				}
+			}
+			return false;
 		}
 	case twoPair:
 		{
-			if ((*this).hand[0].getValue() != h.hand[0].getValue())
-				return (*this).hand[0].getValue() > h.hand[0].getValue();
-			if ((*this).hand[2].getValue() != h.hand[2].getValue())
-				return (*this).hand[2].getValue() > h.hand[2].getValue();
+			for (int i = 0; i <= 4; i++)
+			{
+				if (i == 1 || i == 3)
+					continue;
 
-			return (*this).hand[4].getValue() > h.hand[4].getValue();
+				if ((*this).hand[i].getValue() != h.hand[i].getValue())
+				{
+					if ((*this).hand[i].getValue() == 1)
+						return true;
+					else if (h.hand[i].getValue() == 1)
+						return false;
+					else
+						return (*this).hand[i].getValue() > h.hand[i].getValue();
+				}
+			}
+			return false;
 		}
 	case onePair:
 		{
-			for (int i = 1; i <= 4; i++)
-				if ((*this).hand[i].getValue() != h.hand[i].getValue())
-					return (*this).hand[i].getValue() > h.hand[i].getValue();
+			for (int i = 0; i <= 4; i++)
+			{
+				if (i == 1)
+					continue;
 
+				if ((*this).hand[i].getValue() != h.hand[i].getValue())
+				{
+					if ((*this).hand[i].getValue() == 1)
+						return true;
+					else if (h.hand[i].getValue() == 1)
+						return false;
+					else
+						return (*this).hand[i].getValue() > h.hand[i].getValue();
+				}
+			}
 			return false;
 		}
 	case highCard:
 		{
-			for (int i = 0; i <= 4; i++)
-				if ((*this).hand[i].getValue() != h.hand[i].getValue())
-					return (*this).hand[i].getValue() > h.hand[i].getValue();
+			if ((*this).hand[0].getValue() != h.hand[0].getValue())
+			{
+				if ((*this).hand[0].getValue() == 1)
+					return true;
+				else if (h.hand[0].getValue() == 1)
+					return false;
+				else
+					return (*this).hand[0].getValue() > h.hand[0].getValue();
+			}
+
+			else
+				for (int i = 1; i <= 4; i++)
+					if ((*this).hand[i].getValue() != h.hand[i].getValue())
+						return ((*this).hand[i].getValue() > h.hand[i].getValue());
 
 			return false;
 		}
