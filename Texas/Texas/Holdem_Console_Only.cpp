@@ -6,8 +6,9 @@ using std::endl;
 
 #include "Holdem.h"
 #include "Player.h"
-#include "Deck.h"
+#include "GameStatus.h"
 #include "Card.h"
+#include "Stage.h"
 
 bool Holdem::setParams(money &budget) {
 	//set number of players
@@ -100,55 +101,43 @@ bool Holdem::setParams(money &budget) {
 	throw new std::exception("ERROR: Holdem::setParams() ended in unexpected way");
 }
 
-//not finished!!
-//void Holdem::betting(const player_num startPos, money minRaise) {
-//	player_num currentPos = startPos % numOfPlayers;
-//	player_num terminatePos = startPos % numOfPlayers;
-//	GameStatus status;
-//	money raise;
-//	Player::Action act;
-//	do {
-//		status.pot = pot;
-//		status.minRaise = minRaise;
-//		status.currentBet = minRaise;
-//		Player &player = players.at(currentPos);
-//		
-//		//TODO: check if player has enough money
-//
-//		if (!player.isFolded() || !player.isAllIn()) {
-//			act = player.generateAction(status, raise);
-//			switch (act) {
-//			case Player::Check:
-//				if (status.currentBet != player.getBet()) {
-//					throw new std::exception("player perform invalid check");
-//				}
-//				break;
-//			case Player::Call:
-//				if (player.getBet() > status.currentBet) {
-//					throw new std::exception("player bet > current bet when calling");
-//				}
-//				else if (status.currentBet - player.getBet() > player.getWallet()) {
-//					throw new std::exception("not enough money");
-//				}
-//				//player.setBet(status.currentBet);
-//				//money diff = status.currentBet - player.getBet();
-//				//player.pay(diff);
-//				//pot += diff;
-//				//status.pot += diff;
-//				break;
-//			case Player::Raise:
-//				break;
-//			case Player::AllIn:
-//				break;
-//			case Player::Fold:
-//				break;
-//			default:
-//				throw new std::exception("invalid action");
-//			}
-//		}
-//		// 還在考慮要把Player的金錢計算放在這裡還是Player裡面
-//
-//		++currentPos;
-//		currentPos %= numOfPlayers;
-//	} while (currentPos % numOfPlayers != terminatePos % numOfPlayers);
-//}
+void Holdem::betting(const player_num startPos, Stage stage, money minRaise) {
+	player_num currentPos = startPos % numOfPlayers;
+	player_num terminatePos = startPos % numOfPlayers;
+	GameStatus status;
+	money raise = 0;
+	money pay = 0;
+	Player::Action act;
+
+	do {
+		status.community = community;
+		status.stage = stage;
+		status.pot = pot;
+		status.minRaise = minRaise;
+		status.currentBet = minRaise;
+		Player &player = players.at(currentPos);
+		
+		//TODO: check if player has enough money
+
+		if (!player.isFolded() && !player.isAllIn()) {
+			act = player.generateAction(status, raise, pay);
+			switch (act) {
+			case Player::Check:
+				break;
+			case Player::Call:
+				break;
+			case Player::Raise:
+				break;
+			case Player::AllIn:
+				break;
+			case Player::Fold:
+				break;
+			default:
+				throw new std::exception("invalid action");
+			}
+		}
+
+		++currentPos;
+		currentPos %= numOfPlayers;
+	} while (currentPos % numOfPlayers != terminatePos % numOfPlayers);
+}

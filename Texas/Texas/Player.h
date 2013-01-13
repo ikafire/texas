@@ -18,6 +18,8 @@ public:
 	void nextRound();
 
 	money getWallet() const { return wallet; }
+	money getStageBet() const { return bet; }
+	money getTotalBet() const { return totalBet; }
 	bool isAllIn() const { return allIn; }
 	bool isFolded() const { return folded; }
 
@@ -28,7 +30,8 @@ protected:
 	const bool ALLOW_ALL_IN;
 	std::vector<Card> pocket;
 	money wallet;
-	money bet;
+	money stageBet;
+	money totalBet;
 	bool allIn;
 	bool folded;
 };

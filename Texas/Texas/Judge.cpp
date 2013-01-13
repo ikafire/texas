@@ -1,8 +1,10 @@
 #include <iostream>
 using std::cout;
 using std::endl;
+
 #include <vector>
 using std::vector;
+
 #include "Judge.h"
 
 	/*
@@ -52,13 +54,13 @@ PokerHand Judge::determineHand(Card (&cards)[7] )
 	//統計四個花色的牌數
 	for (int i = 0; i <= 6 ; i++)
 	{
-		if (cards[i].getSuit() == Card::club)
+		if (cards[i].getSuit() == Card::Club)
 			suitCount[1]++;
-		else if (cards[i].getSuit() == Card::diamond)
+		else if (cards[i].getSuit() == Card::Diamond)
 			suitCount[2]++;
-		else if (cards[i].getSuit() == Card::heart)
+		else if (cards[i].getSuit() == Card::Heart)
 			suitCount[3]++;
-		else if (cards[i].getSuit() == Card::spade)
+		else if (cards[i].getSuit() == Card::Spade)
 			suitCount[4]++;
 	}
 

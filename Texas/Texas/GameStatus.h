@@ -4,14 +4,13 @@
 #include <vector>
 
 #include "Card.h"
+#include "Stage.h"
 
 typedef unsigned money;
 
 class GameStatus {
 	friend class Holdem;
 public:
-	enum Stage { PreFlop, Flop, Turn, River };
-
 	std::vector<Card> getCommunity() const { return community; }
 	Stage getStage() const { return stage; }
 	money getPot() const { return pot; }

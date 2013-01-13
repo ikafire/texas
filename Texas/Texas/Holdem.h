@@ -7,6 +7,7 @@
 #include "Deck.h"
 #include "Card.h"
 #include "Player.h"
+#include "Stage.h"
 
 typedef unsigned money;
 typedef unsigned player_num;
@@ -38,7 +39,7 @@ private:
 	void turn();
 	void river();
 	bool showDown();
-	void betting(const player_num startPos, money minRaise);
+	void betting(const player_num startPos, Stage stage, money minRaise);
 };
 
 #endif
