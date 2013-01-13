@@ -18,7 +18,7 @@ public:
 	void nextRound();
 
 	money getWallet() const { return wallet; }
-	money getStageBet() const { return bet; }
+	money getStageBet() const { return stageBet; }
 	money getTotalBet() const { return totalBet; }
 	bool isAllIn() const { return allIn; }
 	bool isFolded() const { return folded; }

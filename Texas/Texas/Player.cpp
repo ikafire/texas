@@ -21,13 +21,14 @@ void Player::receiveCards(Card c1, Card c2) {
 
 void Player::blind(const money amount) {
 	assert(!allIn && !folded);
-	assert(bet == 0);
+	assert(stageBet == 0 && totalBet == 0);
 	if (wallet < amount) {
 		throw new std::exception("ERROR: not enough money to blind bet");
 	}
 
 	wallet -= amount;
-	bet = amount;
+	stageBet = amount;
+	totalBet = amount;
 }
 
 void Player::win(const money amount) {
@@ -37,12 +38,13 @@ void Player::win(const money amount) {
 }
 
 void Player::nextStage() {
-	bet = 0;
+	stageBet = 0;
 }
 
 void Player::nextRound() {
 	pocket.clear();
-	bet = 0;
+	stageBet = 0;
+	totalBet = 0;
 	allIn = false;
 	folded = false;
 }

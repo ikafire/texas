@@ -117,9 +117,9 @@ void Holdem::betting(const player_num startPos, Stage stage, money minRaise) {
 		status.currentBet = minRaise;
 		Player &player = players.at(currentPos);
 		
-		//TODO: check if player has enough money
-
-		if (!player.isFolded() && !player.isAllIn()) {
+		
+		//Note: check whether the player can do certain action or not is Player's job.
+		if ( !(player.isFolded() || player.isAllIn()) ) {
 			act = player.generateAction(status, raise, pay);
 			switch (act) {
 			case Player::Check:
