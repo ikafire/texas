@@ -79,7 +79,7 @@ string PokerHand::toString()
 	return output;
 }
 
-bool PokerHand::operator==(PokerHand& h)
+bool PokerHand::operator== (const PokerHand& h) const
 {
 	if ( (this->order) != h.order )
 		return false;
@@ -152,7 +152,7 @@ bool PokerHand::operator==(PokerHand& h)
 	}//end switch
 }//end bool PokerHand::operator==(PokerHand& h)
 
-bool PokerHand::operator>(PokerHand& h)
+bool PokerHand::operator>(const PokerHand& h) const
 {
 	if ((*this).order != h.order)
 		return (*this).order > h.order;

@@ -22,12 +22,12 @@ public:
 	PokerHand(const Card (&pickList)[5],const int);
 	int getOrder() const;
 
-	bool operator== (PokerHand& h);
-	bool operator!= (PokerHand& h) {return !(h == (*this));}
-	bool operator> (PokerHand& h) ;
-	bool operator>= (PokerHand& h) {return (h > (*this) || h == (*this)); }
-	bool operator< (PokerHand& h) {return !(h >= (*this) ); }
-	bool operator<=(PokerHand& h) {return !(h > (*this));}
+	bool operator== (const PokerHand& h) const;
+	bool operator!= (const PokerHand& h) const {return !(h == (*this));}
+	bool operator> (const PokerHand& h) const;
+	bool operator>= (const PokerHand& h) const {return (h == (*this)) || (*this) > h; }
+	bool operator< (const PokerHand& h) const {return !((*this) >= h ); }
+	bool operator<=(const PokerHand& h) const {return !((*this) > h);}
 
 	std::string toString();
 
