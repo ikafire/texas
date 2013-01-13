@@ -69,7 +69,7 @@ string PokerHand::toString()
 		sstr<< "High Card: ";
 		break;
 	default:
-		sstr<< "ERROR ";
+		throw new std::exception("ERROR at PokerHand::toString()");
 		break;
 	}
 
