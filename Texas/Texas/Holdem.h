@@ -39,7 +39,8 @@ private:
 	void turn();
 	void river();
 	bool showDown();
-	void betting(const player_num startPos, Stage stage, money minRaise);
+	void betting(const player_num startPos, const Stage stage, const money minRaise);
+	void stageResult();
 };
 
 #endif

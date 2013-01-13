@@ -1,3 +1,6 @@
+#include <vector>
+using std::vector;
+
 #include <cassert>
 #include <iostream>
 using std::cout;
@@ -87,11 +90,9 @@ bool Holdem::setParams(money &budget) {
 		switch (ans) {
 		case 'y':
 		case 'Y':
-			cout << endl;
 			return true;
 		case 'n':
 		case 'N':
-			cout << endl;
 			return false;
 		default:
 			break;
@@ -101,43 +102,128 @@ bool Holdem::setParams(money &budget) {
 	throw new std::exception("ERROR: Holdem::setParams() ended in unexpected way");
 }
 
-void Holdem::betting(const player_num startPos, Stage stage, money minRaise) {
+void Holdem::betting(const player_num startPos, const Stage stage, const money minRaise) {
 	player_num currentPos = startPos % numOfPlayers;
 	player_num terminatePos = startPos % numOfPlayers;
-	GameStatus status;
+
 	money raise = 0;
 	money pay = 0;
 	Player::Action act;
+	GameStatus status;
+	status.community = community;
+	status.stage = stage;
+	status.minRaise = minRaise;
+	status.currentBet = minRaise;
+	status.pot = pot;
+
+	cout << "Current bet: " << status.currentBet << endl;
 
 	do {
-		status.community = community;
-		status.stage = stage;
-		status.pot = pot;
-		status.minRaise = minRaise;
-		status.currentBet = minRaise;
+		assert(status.pot == pot);	//change of status.pot must be done below
+
 		Player &player = players.at(currentPos);
-		
-		
 		//Note: check whether the player can do certain action or not is Player's job.
-		if ( !(player.isFolded() || player.isAllIn()) ) {
+		if (player.isFolded()) {
+			cout << player.getName() << " folded" << endl;
+		} else if (player.isAllIn()) {
+			cout << player.getName() << " all-in" << endl;
+		} else {
 			act = player.generateAction(status, raise, pay);
 			switch (act) {
 			case Player::Check:
+				assert(player.getStageBet() == status.currentBet);
+
+				cout << player.getName() << " checked" << endl;
 				break;
 			case Player::Call:
+				assert(player.getStageBet() == status.currentBet);
+
+				pot += pay;
+				status.pot = pot;
+
+				cout << player.getName() << " called" << endl;
 				break;
 			case Player::Raise:
+				assert(raise >= status.minRaise);
+				assert(pay >= raise);
+				assert(player.getStageBet() == status.currentBet + raise);
+
+				pot += pay;
+				status.pot = pot;
+				status.currentBet = player.getStageBet();
+				status.minRaise = raise;
+				terminatePos = currentPos;
+
+				cout << player.getName() << " raised " << raise << ". Current bet: " << status.currentBet << endl;
 				break;
 			case Player::AllIn:
+				assert(player.getStageBet() >= status.currentBet);
+				assert(pay >= player.getStageBet() - status.currentBet);
+				assert(player.isAllIn());
+
+				if (player.getStageBet() >= status.currentBet + status.minRaise) { //all-in == raise
+					pot += pay;
+					status.pot = pot;
+					status.minRaise = player.getStageBet() - status.currentBet;
+					status.currentBet = player.getStageBet();
+					terminatePos = currentPos;
+				} else { //all-in == call
+					pot += pay;
+					status.pot = pot;
+				}
+
+				cout << player.getName() << " all-in and paid " << pay << ". Current bet: " << status.currentBet << endl;
 				break;
 			case Player::Fold:
+				assert(player.isFolded());
+
+				cout << player.getName() << " just folded" << endl;
 				break;
 			default:
-				throw new std::exception("invalid action");
+				throw new std::exception("ERROR: player invalid action");
 			}
 		}
 
 		++currentPos;
 		currentPos %= numOfPlayers;
 	} while (currentPos % numOfPlayers != terminatePos % numOfPlayers);
+}
+
+void Holdem::stageResult() {
+	cout << endl;
+	cout << "Pot: " << pot << endl;
+	cout << "Remaining players: ";
+	for (vector<Player>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
+		if (!iter->isFolded()) {
+			cout << iter->getName() << ' ';
+		}
+	}
+	cout << endl;
+}
+
+void Holdem::preFlop() {
+	cout << endl;
+	cout << "<Game Start>" << endl;
+	cout << "Dealer:      " << players.at(dealer).getName() << endl;
+	cout << "Small blind: " << players.at( (dealer+1) % numOfPlayers ).getName() << endl;
+	cout << "Big blind:   " << players.at( (dealer+2) % numOfPlayers ).getName() << endl;
+
+	players.at( (dealer+1) % numOfPlayers ).blind(sBlind);
+	players.at( (dealer+2) % numOfPlayers ).blind(bBlind);
+	cout << endl;
+	cout << "Blind bet set" << endl;
+
+	for (vector<Player>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
+		iter->receiveCards(deck.nextCard(), deck.nextCard());
+	}
+	vector<Card> pocket = players.at(humanPos).getPocket();
+	cout << endl;
+	cout << "Card dealt" << endl;
+	cout << pocket.at(0).toString() << ' ' << pocket.at(1).toString() << endl;
+
+	cout << endl;
+	cout << "<Pre-flop>" << endl;
+	betting((dealer+3) % numOfPlayers, PreFlop, bBlind);
+
+	stageResult();
 }

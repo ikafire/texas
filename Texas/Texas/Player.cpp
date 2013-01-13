@@ -1,15 +1,19 @@
 #include <vector>
 using std::vector;
 
+#include <string>
+using std::string;
+
 #include <cassert>
 
 #include "Card.h"
 #include "Player.h"
 
-Player::Player(const money budget, const bool allowAllIn) 
+Player::Player(const money budget, const bool allowAllIn, string name) 
 	: ALLOW_ALL_IN(allowAllIn)
 {
 	wallet = budget;
+	this->name = name;
 }
 
 void Player::receiveCards(Card c1, Card c2) {

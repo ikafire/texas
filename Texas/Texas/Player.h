@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include <vector>
+#include <string>
 #include "Card.h"
 #include "GameStatus.h"
 
@@ -10,7 +11,7 @@ typedef unsigned money;
 class Player {
 public:
 	enum Action { Check, Call, Raise, AllIn, Fold };
-	Player(const money budget, const bool allowAllIn);
+	Player(const money budget, const bool allowAllIn, std::string name);
 	void receiveCards(Card c1, Card c2);
 	void blind(const money amount);
 	void win(const money amount);
@@ -22,6 +23,8 @@ public:
 	money getTotalBet() const { return totalBet; }
 	bool isAllIn() const { return allIn; }
 	bool isFolded() const { return folded; }
+	std::string getName() const { return name; }
+	vector<Card> getPocket() const { return pocket; }
 
 	virtual Action generateAction(const GameStatus status, money &raise, money &pay) {
 		throw new std::exception("ERROR: generateAction() not implemented");
@@ -34,6 +37,7 @@ protected:
 	money totalBet;
 	bool allIn;
 	bool folded;
+	std::string name;
 };
 
 #endif

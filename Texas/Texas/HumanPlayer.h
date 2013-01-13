@@ -5,8 +5,8 @@
 
 class HumanPlayer : public Player {
 public:
-	HumanPlayer(const money budget, const bool allowAllIn) 
-		: Player(budget, allowAllIn) {}
+	HumanPlayer(const money budget, const bool allowAllIn, std::string name) 
+		: Player(budget, allowAllIn, name) {}
 	Action generateAction(const GameStatus status, money &raise, money &pay);
 private:
 
