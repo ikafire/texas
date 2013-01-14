@@ -1,36 +1,20 @@
-#include <iostream>
-using std::cout;
 #include <string>
 using std::string;
 #include <sstream>
 using std::stringstream;
 
-#include "PokerHand.h"
+#include "PokerHand2.h"
 
-PokerHand::PokerHand(const Card (&pickList)[5], const int o)
-	:order(o)
+PokerHand::PokerHand(const Order o, const vector<Card>& pickList)
+	:order(o), hand(pickList)
 {
-	for (int i = 0; i <= 4; i++)
-		hand[i] = pickList[i];
-	sortSuit();
 }
 
-int PokerHand::getOrder() const
+PokerHand::Order PokerHand::getOrder() const
 {
 	return order;
 }
 
-void PokerHand::sortSuit()
-{
-	for (int i = 0; i <=3; i++)
-		for (int j = 1; i + j < 5; j++)
-		if (hand[i].getValue() == hand[i+j].getValue() && hand[i].getSuit() < hand[i+j].getSuit())
-		{
-			Card temp = hand[i];
-			hand[i] = hand[i+j];
-			hand[i+j] = temp;
-		}
-}
 
 string PokerHand::toString()
 {
@@ -38,34 +22,34 @@ string PokerHand::toString()
 
 	switch (order)
 	{
-	case royalStraightFlush:
+	case RoyalStraightFlush:
 		sstr<< "Royal Straight Flush: ";
 		break;
-	case straightFlush:
+	case StraightFlush:
 		sstr<< "Straight Flush: ";
 		break;
-	case fourOfAKind:
+	case FourOfAKind:
 		sstr<< "Four of a Kind: ";
 		break;
-	case fullHouse:
+	case FullHouse:
 		sstr<< "Full House: ";
 		break;
-	case flush:
+	case Flush:
 		sstr<< "Flush: ";
 		break;
-	case straight:
+	case Straight:
 		sstr<< "Straight: ";
 		break;
-	case threeOfAKind:
+	case ThreeOfAKind:
 		sstr<< "Three of a Kind: ";
 		break;
-	case twoPair:
+	case TwoPairs:
 		sstr<< "Two Pairs: ";
 		break;
-	case onePair:
+	case OnePair:
 		sstr<< "One Pair: ";
 		break;
-	case highCard:
+	case HighCard:
 		sstr<< "High Card: ";
 		break;
 	default:
@@ -86,15 +70,15 @@ bool PokerHand::operator== (const PokerHand& h) const
 	
 	switch (order)
 	{
-	case royalStraightFlush:
+	case RoyalStraightFlush:
 		return true;
-	case straightFlush:
+	case StraightFlush:
 		return  ( (*this).hand[0].getValue() == h.hand[0].getValue() );		
-	case fourOfAKind:
+	case FourOfAKind:
 		return ((*this).hand[0].getValue() == h.hand[0].getValue() && (*this).hand[4].getValue() == h.hand[4].getValue() );
-	case fullHouse:
+	case FullHouse:
 		return ((*this).hand[0].getValue() == h.hand[0].getValue() && (*this).hand[4].getValue() == h.hand[4].getValue() );
-	case flush:
+	case Flush:
 		{
 			for (int i = 0; i <= 4 ; i++)
 				if ((*this).hand[i].getValue() != h.hand[i].getValue())
@@ -102,9 +86,9 @@ bool PokerHand::operator== (const PokerHand& h) const
 
 			return true;
 		}
-	case straight:
+	case Straight:
 		return  ( (*this).hand[0].getValue() == h.hand[0].getValue() );	
-	case threeOfAKind:
+	case ThreeOfAKind:
 		{
 			if ((*this).hand[0].getValue() != h.hand[0].getValue())
 				return false;
@@ -115,7 +99,7 @@ bool PokerHand::operator== (const PokerHand& h) const
 
 			return true;
 		}
-	case twoPair:
+	case TwoPairs:
 		{
 			if ((*this).hand[0].getValue() != h.hand[0].getValue())
 				return false;
@@ -126,7 +110,7 @@ bool PokerHand::operator== (const PokerHand& h) const
 
 			return true;
 		}
-	case onePair:
+	case OnePair:
 		{
 			if ((*this).hand[0].getValue() != h.hand[0].getValue())
 				return false;
@@ -139,7 +123,7 @@ bool PokerHand::operator== (const PokerHand& h) const
 
 			return true;
 		}
-	case highCard:
+	case HighCard:
 		{
 			for (int i = 0; i <= 4 ; i++)
 				if ((*this).hand[i].getValue() != h.hand[i].getValue())
@@ -148,7 +132,7 @@ bool PokerHand::operator== (const PokerHand& h) const
 			return true;
 		}
 	default:
-		cout<<"ERROR at operator==().\n";
+		throw new std::exception("ERROR at operator==().");
 	}//end switch
 }//end bool PokerHand::operator==(PokerHand& h)
 
@@ -159,12 +143,12 @@ bool PokerHand::operator>(const PokerHand& h) const
 	
 	switch(order)
 	{
-	case royalStraightFlush:
+	case RoyalStraightFlush:
 		return false;
-	case straightFlush:
+	case StraightFlush:
 		return (*this).hand[0].getValue() > h.hand[0].getValue();
-	case fourOfAKind:
-	case fullHouse:
+	case FourOfAKind:
+	case FullHouse:
 		{
 			if ((*this).hand[0].getValue() != h.hand[0].getValue())
 			{
@@ -193,7 +177,7 @@ bool PokerHand::operator>(const PokerHand& h) const
 			else
 				return false;
 		}
-	case flush:
+	case Flush:
 		{
 			if ((*this).hand[0].getValue() != h.hand[0].getValue())
 			{
@@ -212,9 +196,9 @@ bool PokerHand::operator>(const PokerHand& h) const
 
 			return false;
 		}
-	case straight:
+	case Straight:
 		return (*this).hand[4].getValue() > h.hand[4].getValue();
-	case threeOfAKind:
+	case ThreeOfAKind:
 		{
 			for (int i = 0; i <= 4; i++)
 			{
@@ -233,7 +217,7 @@ bool PokerHand::operator>(const PokerHand& h) const
 			}
 			return false;
 		}
-	case twoPair:
+	case TwoPairs:
 		{
 			for (int i = 0; i <= 4; i++)
 			{
@@ -252,7 +236,7 @@ bool PokerHand::operator>(const PokerHand& h) const
 			}
 			return false;
 		}
-	case onePair:
+	case OnePair:
 		{
 			for (int i = 0; i <= 4; i++)
 			{
@@ -271,7 +255,7 @@ bool PokerHand::operator>(const PokerHand& h) const
 			}
 			return false;
 		}
-	case highCard:
+	case HighCard:
 		{
 			if ((*this).hand[0].getValue() != h.hand[0].getValue())
 			{
@@ -291,6 +275,6 @@ bool PokerHand::operator>(const PokerHand& h) const
 			return false;
 		}
 	default:
-		cout<<"ERROR at operator>().\n";
+		throw new std::exception("ERROR at operator>().");
 	}//end switch
 }//end bool PokerHand::operator>(PokerHand& h)
