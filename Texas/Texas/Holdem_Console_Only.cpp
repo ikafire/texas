@@ -108,7 +108,7 @@ bool Holdem::setParams(money &budget) {
 	throw new std::exception("ERROR: Holdem::setParams() ended in unexpected way");
 }
 
-void Holdem::betting(const Stage stage) {
+bool Holdem::betting(const Stage stage) {
 	player_num currentPos = (stage == PreFlop ? (dealer+3)%numOfPlayers : (dealer+1)%numOfPlayers);
 	player_num terminatePos = currentPos;
 
@@ -127,7 +127,10 @@ void Holdem::betting(const Stage stage) {
 	do {
 		assert(status.pot == pot);	//change of status.pot must be done below
 
-		Player &player = players.at(currentPos);
+		//check for early end (only one player not folded)
+		if (checkEarlyEnd()) return true;
+
+		Player &player = *players.at(currentPos);
 		//Note: check whether the player can do certain action or not is Player's job.
 		if (player.isFolded()) {
 			cout << player.getName() << " folded" << endl;
@@ -193,46 +196,52 @@ void Holdem::betting(const Stage stage) {
 		++currentPos;
 		currentPos %= numOfPlayers;
 	} while (currentPos % numOfPlayers != terminatePos % numOfPlayers);
+
+	return false; //no early end
 }
 
 void Holdem::stageResult() {
 	cout << endl;
 	cout << "Pot: " << pot << endl;
 	cout << "Remaining players: ";
-	for (vector<Player>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
-		if (!iter->isFolded()) {
-			cout << iter->getName() << ' ';
+	for (vector<Player*>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
+		(*iter)->nextStage();
+		if (!(*iter)->isFolded()) {
+			cout << (*iter)->getName() << ' ';
 		}
 	}
 	cout << endl;
 }
 
-void Holdem::preFlop() {
+bool Holdem::preFlop() {
 	cout << endl;
 	cout << "<Game Start>" << endl;
-	cout << "Dealer:      " << players.at(dealer).getName() << endl;
-	cout << "Small blind: " << players.at( (dealer+1) % numOfPlayers ).getName() << endl;
-	cout << "Big blind:   " << players.at( (dealer+2) % numOfPlayers ).getName() << endl;
+	cout << "Dealer:      " << players.at(dealer)->getName() << endl;
+	cout << "Small blind: " << players.at( (dealer+1) % numOfPlayers )->getName() << endl;
+	cout << "Big blind:   " << players.at( (dealer+2) % numOfPlayers )->getName() << endl;
 
-	players.at( (dealer+1) % numOfPlayers ).blind(sBlind);
-	players.at( (dealer+2) % numOfPlayers ).blind(bBlind);
+	players.at( (dealer+1) % numOfPlayers )->blind(sBlind);
+	players.at( (dealer+2) % numOfPlayers )->blind(bBlind);
 	cout << endl;
 	cout << "Blind bet set." << endl;
 
-	for (vector<Player>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
-		iter->receiveCards(deck.nextCard(), deck.nextCard());
+	for (vector<Player*>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
+		(*iter)->receiveCards(deck.nextCard(), deck.nextCard());
 	}
 	cout << endl;
 	cout << "Card dealt." << endl;
 
 	cout << endl;
 	cout << "<Pre-flop Betting>" << endl;
-	betting(PreFlop);
+
+	if (betting(PreFlop)) return true;
 
 	stageResult();
+
+	return false;
 }
 
-void Holdem::flop() {
+bool Holdem::flop() {
 	assert(community.size() == 0);
 
 	deck.nextCard();
@@ -248,12 +257,15 @@ void Holdem::flop() {
 
 	cout << endl;
 	cout << "<Flop Betting>" << endl;
-	betting(Flop);
+
+	if (betting(Flop)) return true;
 
 	stageResult();
+
+	return false;
 }
 
-void Holdem::turn() {
+bool Holdem::turn() {
 	assert(community.size() == 3);
 
 	deck.nextCard();
@@ -263,12 +275,15 @@ void Holdem::turn() {
 
 	cout << endl;
 	cout << "<Turn Betting>" << endl;
-	betting(Turn);
+
+	if (betting(Turn)) return true;
 
 	stageResult();
+
+	return false;
 }
 
-void Holdem::river() {
+bool Holdem::river() {
 	assert(community.size() == 4);
 
 	deck.nextCard();
@@ -278,18 +293,21 @@ void Holdem::river() {
 
 	cout << endl;
 	cout << "<River Betting>" << endl;
-	betting(River);
+
+	if (betting(River)) return true;
 
 	stageResult();
+
+	return false;
 }
 
-bool Holdem::showDown() {
+void Holdem::showDown() {
 	//filter competitors: pick out folded players and calculate Hands
 	vector<Player*> competitors;
-	for (vector<Player>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
-		if (!iter->isFolded()) {
-			competitors.push_back(&*iter);
-			iter->calcHand(community);
+	for (vector<Player*>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
+		if (!(*iter)->isFolded()) {
+			competitors.push_back(*iter);
+			(*iter)->calcHand(community);
 		}
 	}
 
@@ -306,25 +324,6 @@ bool Holdem::showDown() {
 	} while (competitors.size() > 0);
 
 	distributePot(groups);
-
-	cout << endl;
-	do {
-		cout << "Do you want to play another round? (y/n): ";
-		char ans;
-		cin >> ans;
-		switch (ans) {
-		case 'y':
-		case 'Y':
-			return true;
-		case 'n':
-		case 'N':
-			return false;
-		default:
-			break;
-		}
-	} while (true);
-
-	throw new std::exception("ERROR: Holdem::showDown() ended in unexpected way");
 }
 
 void Holdem::distributePot(deque< vector<Player*> > &ranks) {
@@ -333,8 +332,8 @@ void Holdem::distributePot(deque< vector<Player*> > &ranks) {
 	//make bet list
 	deque<money> playerBets;
 	money sum = 0;
-	for (vector<Player>::iterator iter = players.begin(); iter != players.end(); ++iter) {
-		money tmp = iter->getTotalBet();
+	for (vector<Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
+		money tmp = (*iter)->getTotalBet();
 		if (tmp > 0) {
 			playerBets.push_back(tmp);
 			sum += tmp;
@@ -403,7 +402,92 @@ void Holdem::distributePot(deque< vector<Player*> > &ranks) {
 	}
 
 	//the rest of the pot goes to small blind player
-	Player &sbPlayer = players.at( (dealer+1)%numOfPlayers );
+	Player &sbPlayer = *players.at( (dealer+1)%numOfPlayers );
 	sbPlayer.win(pot);
 	cout << sbPlayer.getName() << " got " << pot << " due to rounding." << endl;
+}
+
+bool Holdem::askContinue() {
+	cout << endl;
+	do {
+		cout << "Do you want to play another round? (y/n): ";
+		char ans;
+		cin >> ans;
+		switch (ans) {
+		case 'y':
+		case 'Y':
+			return true;
+		case 'n':
+		case 'N':
+			return false;
+		default:
+			break;
+		}
+	} while (true);
+
+	throw new std::exception("ERROR: Holdem::showDown() ended in unexpected way");
+}
+
+bool Holdem::checkEarlyEnd() {
+	//calc how many player not folded
+	player_num nFoldNum = 0;
+	Player *notFolded;
+	for (vector<Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
+		if (!(*iter)->isFolded()) {
+			++nFoldNum;
+			notFolded = *iter;
+			if (nFoldNum > 1) break;
+		}
+	}
+
+	if (nFoldNum > 1) {
+		return false;
+	}
+
+	//if only one player left, he wins the whole pot
+	notFolded->win(pot);
+	cout << endl;
+	cout << notFolded->getName() << " is/are the only player left, thus win(s) " << pot << endl;
+	return true;
+}
+
+void Holdem::checkBroke() {
+	if (players.at(humanPos)->isBroke()) {
+		cout << endl;
+		cout << "You are broke!" << endl;
+		gameOver();
+	}
+
+	player_num num = 0;
+	while (num <= players.size()) {
+		if (players.at(num)->isBroke()) {
+			brokePlayers.push_back(players.at(num));
+			players.erase(players.begin()+num);
+		} else {
+			++num;
+		}
+	}
+	numOfPlayers = players.size();
+
+	cout << endl;
+	cout << "Remaining players: ";
+	for (vector<Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
+		cout << (*iter)->getName() << ' ';
+	}
+	cout << endl;
+}
+
+void Holdem::gameOver() {
+	cout << "Game Over!" << endl;
+	cout << "Result:" << endl;
+	for (vector<Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
+		cout << (*iter)->getName() << ": " << (*iter)->getWallet() << endl;
+	}
+	for (vector<Player*>::iterator iter = brokePlayers.begin(); iter != brokePlayers.end(); ++iter) {
+		cout << (*iter)->getName() << ": " << (*iter)->getWallet() << endl;
+	}
+
+	system("pause");
+
+	exit(EXIT_SUCCESS);
 }

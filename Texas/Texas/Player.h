@@ -19,6 +19,7 @@ public:
 	void nextStage();
 	void nextRound();
 	void calcHand(const std::vector<Card> &community);
+	bool isBroke() const;
 
 	money getWallet() const { return wallet; }
 	money getStageBet() const { return stageBet; }

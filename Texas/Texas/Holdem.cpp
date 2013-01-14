@@ -24,34 +24,43 @@ void Holdem::run() {
 }
 
 void Holdem::constructPlayers(const money budget) {
-	for (player_num n=0; n<numOfPlayers; ++n) {
+	for (player_num n = 0; n < numOfPlayers; ++n) {
 		if (n == humanPos) {
 			HumanPlayer hp(budget, allowAllIn, "You");
-			players.push_back(hp);
+			playerList.push_back(hp);
 		} else {
 			ComPlayer cp(budget, allowAllIn, "Com#"+n);
-			players.push_back(cp);
+			playerList.push_back(cp);
 		}
 	}
 
+	for (vector<Player>::iterator iter = playerList.begin(); iter != playerList.end(); ++iter) {
+		players.push_back(&*iter);
+	}
+
 	assert(players.size() == numOfPlayers);
+	assert(playerList.size() == numOfPlayers);
 }
 
 void Holdem::startGame() {
 	bool playAgain;
 	do {
-		//TODO: check if human player broke
-		//TODO: check for early end after each stage (1 player remain)
-		preFlop();
-		flop();
-		turn();
-		river();
-		playAgain = showDown();
+		do {
+			if (preFlop()) break;
+			if (flop()) break;
+			if (turn()) break;
+			if (river()) break;
+			showDown();
+		} while (false); //for easier flow control
+
+		playAgain = askContinue();
 		if (playAgain) {
 			checkBroke();
 			cleanUp();
 		}
 	} while (playAgain);
+
+	gameOver();
 }
 
 vector<Player*> Holdem::highestHands(vector<Player*> &competitors) {
@@ -82,10 +91,10 @@ void Holdem::cleanUp() {
 	deck.reset();
 	community.clear();
 	pot = 0;
-	dealer = (dealer+1)%numOfPlayers;
+	dealer = (dealer+1) % numOfPlayers;
 	++roundNum;
 
-	for (vector<Player>::iterator iter = players.begin(); iter != players.end(); ++iter) {
-		iter->nextRound();
+	for (vector<Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
+		(*iter)->nextRound();
 	}
 }

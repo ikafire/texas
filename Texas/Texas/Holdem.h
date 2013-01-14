@@ -20,7 +20,9 @@ public:
 	void run();
 private:
 	Deck deck;
-	std::vector<Player> players;
+	std::vector<Player> playerList;
+	std::vector<Player*> players;
+	std::vector<Player*> brokePlayers;
 	std::vector<Card> community;
 	money pot;
 	money sBlind;
@@ -37,15 +39,18 @@ private:
 	void cleanUp();
 	//functions below are console-only
 	bool setParams(money &budget);
-	void preFlop();
-	void flop();
-	void turn();
-	void river();
-	bool showDown();
-	void betting(const Stage stage);
+	bool preFlop();
+	bool flop();
+	bool turn();
+	bool river();
+	void showDown();
+	bool betting(const Stage stage);
 	void stageResult();
 	void distributePot(std::deque< std::vector<Player*> > &ranks);
 	void checkBroke();
+	bool checkEarlyEnd();
+	bool askContinue();
+	void gameOver();
 };
 
 #endif
