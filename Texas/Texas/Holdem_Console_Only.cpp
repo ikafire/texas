@@ -458,6 +458,9 @@ void Holdem::checkBroke() {
 		gameOver();
 	}
 
+	Player *oldDealer = players.at(dealer);
+
+	//kick broke players out of game
 	player_num num = 0;
 	while (num <= players.size()) {
 		if (players.at(num)->isBroke(bBlind)) {
@@ -467,7 +470,33 @@ void Holdem::checkBroke() {
 			++num;
 		}
 	}
+
+	//set new numOfPlayers
 	numOfPlayers = players.size();
+
+	//set new dealer pos
+	Player *newDealer;
+	do {
+		//if old dealer still exist, position doesn't change
+		newDealer = *(std::find(players.begin(), players.end(), oldDealer));
+		if (newDealer == *players.end()) {
+			newDealer = 0;
+		}
+		//if old dealer is out of game, pick a player before him as new dealer (increment will be later)
+		//find his previous player
+		if (oldDealer != &*playerList.begin()) {
+			--oldDealer;
+		} else {
+			oldDealer = &*(playerList.end()-1);
+		}
+	} while (newDealer == 0);
+	//increment dealer pos
+	if (++newDealer == *players.end()) {
+		newDealer = *players.begin();
+	}
+	//find index of dealer
+	vector<Player*>::iterator index = std::find(players.begin(), players.end(), newDealer);
+	dealer = index - players.begin();
 
 	cout << endl;
 	cout << "Remaining players: ";

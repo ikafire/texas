@@ -91,7 +91,6 @@ void Holdem::cleanUp() {
 	deck.reset();
 	community.clear();
 	pot = 0;
-	dealer = (dealer+1) % numOfPlayers;
 	++roundNum;
 
 	for (vector<Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
