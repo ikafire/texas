@@ -9,8 +9,8 @@ using std::srand;
 using std::time;
 
 #include "Card.h"
-#include "Judge.h"
-#include "PokerHand.h"
+#include "Judge2.h"
+#include "PokerHand2.h"
 
 void randomTest();
 void customTest();
@@ -32,23 +32,23 @@ int main()
 
 void customTest()
 {
-	Card cardSet[7];
-	cardSet[0] = Card(1,Card::club);
-	cardSet[1] = Card(1,Card::heart);
-	cardSet[2] = Card(13,Card::club);
-	cardSet[3] = Card(13,Card::diamond);
-	cardSet[4] = Card(13,Card::heart);
-	cardSet[5] = Card(3,Card::club);
-	cardSet[6] = Card(13,Card::spade);
+	vector<Card> cardSet(7);
+	cardSet[0] = Card(1,Card::Club);
+	cardSet[1] = Card(2,Card::Club);
+	cardSet[2] = Card(3,Card::Club);
+	cardSet[3] = Card(4,Card::Club);
+	cardSet[4] = Card(5,Card::Heart);
+	cardSet[5] = Card(6,Card::Club);
+	cardSet[6] = Card(7,Card::Club);
 
-	Card otherSet[7];
-	otherSet[0] = Card(5,Card::club);
-	otherSet[1] = Card(5,Card::spade);
-	otherSet[2] = Card(1,Card::heart);
-	otherSet[3] = Card(1,Card::spade);
-	otherSet[4] = Card(1,Card::diamond);
-	otherSet[5] = Card(10,Card::club);
-	otherSet[6] = Card(1,Card::club);
+	vector<Card> otherSet(7);
+	otherSet[0] = Card(1,Card::Spade);
+	otherSet[1] = Card(2,Card::Spade);
+	otherSet[2] = Card(2,Card::Heart);
+	otherSet[3] = Card(3,Card::Spade);
+	otherSet[4] = Card(4,Card::Spade);
+	otherSet[5] = Card(5,Card::Spade);
+	otherSet[6] = Card(5,Card::Heart);
 
 	for (int i = 0; i < 7; i++)
 		cout<<cardSet[i].toString()<<' ';
@@ -79,13 +79,13 @@ void randomTest()
 {
 	srand(time(0));
 
-	Card cards[52];
+	vector<Card> cards(52);
 	for (int i = 0; i < 52; i++)
 	{
 		cards[i] = Card(1 + i % 13, static_cast<Card::Suit> (1 + i % 4) );
 	}
 
-	Card cardSet[7];
+	vector<Card> cardSet(7);
 	bool same = false;
 	do
 	{
@@ -107,7 +107,7 @@ void randomTest()
 	PokerHand result = Judge::determineHand(cardSet);
 	cout<<result.toString()<<endl;
 
-	Card otherSet[7];
+	vector<Card> otherSet(7);
 	do
 	{
 		same = false;
