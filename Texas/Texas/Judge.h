@@ -3,19 +3,23 @@
 
 #include <vector>
 using std::vector;
-
 #include "PokerHand.h"
 #include "Card.h"
 
 class Judge
 {
 public:
-	static PokerHand determineHand(Card (&cards)[7]);
+	static PokerHand determineHand (vector<Card>& cardSet);
+	static void sortCardSet(vector<Card>& cardSet);
+	static vector<int> countValues (const vector<Card>& cardSet);
+	static vector<int> countTable (const vector<int>& valueCount);
+	static vector<int> countSuits (const vector<Card>& cardSet);
+	static vector<int> identifyLength (const vector<int>& valueCount);
+	static PokerHand::Order orderAnalysis (const vector<Card>& cardSet, const vector<int>& countList, const vector<int>& suitCount, const vector<int>& lengthTag);
+
 private:
-	static void pickHand (Card (&cards)[7], Card (&pickList)[5], const int handType, const int (&valueCount)[14], 
-							const int theSuit = 0,const int sValue = 0);
-	static int checkFlushType (Card (&cards)[7], int theSuit, vector<Card> &suitSet, int& sValue);
-	static bool checkStraight(const int (&valueCount)[14], int& sValue);
+	//TODO: finish computer strategy
+	static vector<Card> pickHand (PokerHand::Order, const vector<Card>& cardSet, const vector<int>& valueCount, const vector<int>& suitCount, const vector<int>& lengthTag);
 };
 
 #endif
