@@ -15,6 +15,7 @@ using std::stringstream;
 
 Holdem::Holdem() {
 	pot = 0;
+	gotoShowDown = false;
 }
 
 void Holdem::run() {
@@ -70,7 +71,7 @@ void Holdem::startGame() {
 }
 
 vector<Player*> Holdem::highestHands(vector<Player*> &competitors) {
-	assert(competitors.size() > 0);
+	assert(!competitors.empty());
 	
 	//pick the largest hand
 	PokerHand highestHand = competitors.front()->getHand();
@@ -102,6 +103,7 @@ void Holdem::cleanUp() {
 	deck.reset();
 	community.clear();
 	pot = 0;
+	gotoShowDown = false;
 	++roundNum;
 
 	for (vector<Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {

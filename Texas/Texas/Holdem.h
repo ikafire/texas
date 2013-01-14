@@ -35,6 +35,7 @@ private:
 	player_num humanPos;
 	bool allowAllIn;
 	unsigned roundNum;
+	bool gotoShowDown; //when all but one players are all-in, skip betting
 
 	void constructPlayers(const money budget);
 	void startGame();

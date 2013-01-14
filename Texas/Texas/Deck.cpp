@@ -52,9 +52,9 @@ Card Deck::nextCard() {
 	int nextPos;
 	do {
 		nextPos = rand() % NUM_OF_CARDS;
-	} while (isTaken[nextPos]);	//if the card in generated position is taken, generate another one
+	} while (isTaken.at(nextPos));	//if the card in generated position is taken, generate another one
 
-	isTaken[nextPos] = true;
+	isTaken.at(nextPos) = true;
 	++cardDealt;
-	return cardSet[nextPos];
+	return cardSet.at(nextPos);
 }
