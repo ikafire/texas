@@ -36,8 +36,6 @@ void Player::blind(const money amount) {
 }
 
 void Player::win(const money amount) {
-	assert(!folded);
-	
 	wallet += amount;
 }
 
@@ -51,4 +49,5 @@ void Player::nextRound() {
 	totalBet = 0;
 	allIn = false;
 	folded = false;
+	hand = PokerHand();
 }

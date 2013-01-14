@@ -32,6 +32,8 @@ private:
 
 	void constructPlayers(const money budget);
 	void startGame();
+	vector<Player*> highestHands(vector<Player*> &competitors);
+	void cleanUp();
 	//functions below are console-only
 	bool setParams(money &budget);
 	void preFlop();
@@ -41,6 +43,8 @@ private:
 	bool showDown();
 	void betting(const Stage stage);
 	void stageResult();
+	void distributePot(vector< vector<Player*> > &ranks);
+	void checkBroke();
 };
 
 #endif

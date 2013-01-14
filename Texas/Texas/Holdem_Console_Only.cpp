@@ -1,7 +1,11 @@
 #include <vector>
 using std::vector;
 
+#include <deque>
+using std::deque;
+
 #include <cassert>
+#include <algorithm>
 #include <iostream>
 using std::cout;
 using std::cin;
@@ -13,6 +17,7 @@ using std::endl;
 #include "Card.h"
 #include "Stage.h"
 #include "PokerHand.h"
+#include "Judge.h"
 
 bool Holdem::setParams(money &budget) {
 	//set number of players
@@ -278,13 +283,127 @@ void Holdem::river() {
 	stageResult();
 }
 
-//bool Holdem::showDown() {
-//	vector<Player*> competitors;
-//	vector<PokerHand> hands;
-//	for (vector<Player>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
-//		if (!iter->isFolded()) {
-//			competitors.push_back(&*iter);
-//		}
-//	}
-//
-//}
+bool Holdem::showDown() {
+	//filter competitors: pick out folded players and calculate Hands
+	vector<Player*> competitors;
+	for (vector<Player>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
+		if (!iter->isFolded()) {
+			competitors.push_back(&*iter);
+			iter->calcHand(community);
+		}
+	}
+
+	//print competitors' cards
+	cout << endl;
+	for (player_num num = 0; num != competitors.size(); ++num) {
+		cout << competitors.at(num)->getName() << " got: " << competitors.at(num)->getHand().toString() << endl;
+	}
+
+	//grouping competitors with their Hands
+	vector< vector<Player*> > groups;
+	do {
+		groups.push_back(highestHands(competitors));
+	} while (competitors.size() > 0);
+
+	distributePot(groups);
+
+	cout << endl;
+	do {
+		cout << "Do you want to play another round? (y/n): ";
+		char ans;
+		cin >> ans;
+		switch (ans) {
+		case 'y':
+		case 'Y':
+			return true;
+		case 'n':
+		case 'N':
+			return false;
+		default:
+			break;
+		}
+	} while (true);
+
+	throw new std::exception("ERROR: Holdem::showDown() ended in unexpected way");
+}
+
+void Holdem::distributePot(vector< vector<Player*> > &ranks) {
+	assert(ranks.size() > 0);
+
+	//make bet list
+	deque<money> playerBets;
+	money sum = 0;
+	for (vector<Player>::iterator iter = players.begin(); iter != players.end(); ++iter) {
+		money tmp = iter->getTotalBet();
+		if (tmp > 0) {
+			playerBets.push_back(tmp);
+			sum += tmp;
+		}
+	}
+	assert(sum==pot);
+
+	deque<money> sidePots;	//list of side pots
+	deque<money> potThresholds; //list of the thresholds of side pots
+	deque<int> potTies; //list of how many players are sharing the pot
+	sort(playerBets.begin(), playerBets.end());
+	
+	//calculate side pots
+	while (playerBets.size() > 0) {
+		money tmpThres = playerBets.front();
+		sidePots.push_back(tmpThres * playerBets.size());
+		potThresholds.push_back(tmpThres);
+		potTies.push_back(0);
+		//minus all bets (moved to the side pot)
+		for (deque<money>::iterator iter = playerBets.begin(); iter != playerBets.end(); ++iter) {
+			*iter -= tmpThres;
+		}
+		//trim
+		while (playerBets.front() == 0) {
+			playerBets.pop_front();
+		}
+	}
+
+	assert(sidePots.size() == potThresholds.size() && sidePots.size() == potTies.size());
+
+	while (sidePots.size() > 0) {
+		assert(ranks.size() > 0);
+		//calculate ties
+		vector<Player*> &winners = ranks.front();
+		for (player_num num = 0; num != winners.size(); ++num) {
+			for (deque<money>::size_type potNum = 0; potNum != sidePots.size(); ++potNum) {
+				if (winners.at(num)->getTotalBet() > potThresholds.at(potNum)) {
+					++(potTies.at(potNum));
+				}
+			}
+		}
+
+		//distribute available side pots
+		for (player_num num = 0; num != winners.size(); ++num) {
+			Player *winner = winners.at(num);
+			money award = 0;
+			for (deque<money>::size_type potNum = 0; potNum != sidePots.size(); ++potNum) {
+				if (winner->getTotalBet() > potThresholds.at(potNum)) {
+					assert(potTies.at(potNum) > 0);
+					award += sidePots.at(potNum) / potTies.at(potNum);
+					pot -= sidePots.at(potNum) / potTies.at(potNum);
+				}
+			}
+			winner->win(award);
+			cout << endl;
+			cout << winner->getName() << " won " << award << "!" << endl;
+		}
+
+		//discard distributed side pots
+		while (potTies.front() != 0) {
+			sidePots.pop_front();
+			potThresholds.pop_front();
+			potTies.pop_front();
+		}
+		ranks.erase(ranks.begin());
+	}
+
+	//the rest of the pot goes to small blind player
+	Player &sbPlayer = players.at( (dealer+1)%numOfPlayers );
+	sbPlayer.win(pot);
+	cout << sbPlayer.getName() << " got " << pot << " due to rounding." << endl;
+}

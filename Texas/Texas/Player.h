@@ -5,6 +5,7 @@
 #include <string>
 #include "Card.h"
 #include "GameStatus.h"
+#include "PokerHand.h"
 
 typedef unsigned money;
 
@@ -17,6 +18,7 @@ public:
 	void win(const money amount);
 	void nextStage();
 	void nextRound();
+	void calcHand(const vector<Card> &community);
 
 	money getWallet() const { return wallet; }
 	money getStageBet() const { return stageBet; }
@@ -25,6 +27,7 @@ public:
 	bool isFolded() const { return folded; }
 	std::string getName() const { return name; }
 	std::vector<Card> getPocket() const { return pocket; }
+	PokerHand getHand() const { return hand; }
 
 	virtual Action generateAction(const GameStatus status, money &raise, money &pay) {
 		throw new std::exception("ERROR: generateAction() not implemented");
@@ -38,6 +41,7 @@ protected:
 	bool allIn;
 	bool folded;
 	std::string name;
+	PokerHand hand;
 };
 
 #endif
