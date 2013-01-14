@@ -19,7 +19,7 @@ public:
 	void nextStage();
 	void nextRound();
 	void calcHand(const std::vector<Card> &community);
-	bool isBroke() const;
+	bool isBroke(money bigBlind);
 
 	money getWallet() const { return wallet; }
 	money getStageBet() const { return stageBet; }
@@ -41,6 +41,7 @@ protected:
 	money totalBet;
 	bool allIn;
 	bool folded;
+	bool broke;
 	std::string name;
 	PokerHand hand;
 };

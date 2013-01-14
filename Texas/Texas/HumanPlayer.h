@@ -9,7 +9,8 @@ public:
 		: Player(budget, allowAllIn, name) {}
 	Action generateAction(const GameStatus status, money &raise, money &pay);
 private:
-
+	Action getInput();
+	bool actionValid(Action act, const GameStatus &status, money &raise);
 };
 
 #endif

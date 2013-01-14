@@ -15,7 +15,7 @@ using std::time;
 #include "Deck.h"
 #include "Card.h"
 
-Deck::Deck() : cardSet(NUM_OF_CARDS) {
+Deck::Deck() {
 	for (int s=1; s<=4; ++s) {
 		for (int v=1; v<=13; ++v) {
 			Card::Suit suit;
@@ -58,20 +58,3 @@ Card Deck::nextCard() {
 	++cardDealt;
 	return cardSet[nextPos];
 }
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
-//
-//int main() {
-//	Deck deck;
-//	for (int i=0; i<52; ++i) {
-//		cout << deck.nextCard().toString() << endl;
-//	}
-//	deck.reset();
-//	cout << endl;
-//	for (int i=0; i<52; ++i) {
-//		cout << deck.nextCard().toString() << endl;
-//	}
-//	system("pause");
-//}

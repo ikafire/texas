@@ -8,12 +8,19 @@ using std::string;
 
 #include "Card.h"
 #include "Player.h"
+#include "Judge.h"
 
 Player::Player(const money budget, const bool allowAllIn, string name) 
 	: ALLOW_ALL_IN(allowAllIn)
 {
 	wallet = budget;
 	this->name = name;
+	stageBet = 0;
+	totalBet = 0;
+	allIn = false;
+	folded = false;
+	broke = false;
+	hand = PokerHand();
 }
 
 void Player::receiveCards(Card c1, Card c2) {
@@ -33,6 +40,10 @@ void Player::blind(const money amount) {
 	wallet -= amount;
 	stageBet = amount;
 	totalBet = amount;
+
+	if (wallet == 0) {
+		allIn = true;
+	}
 }
 
 void Player::win(const money amount) {
@@ -50,4 +61,23 @@ void Player::nextRound() {
 	allIn = false;
 	folded = false;
 	hand = PokerHand();
+}
+
+void Player::calcHand(const vector<Card> &community) {
+	vector<Card> cards(community);
+	cards.insert(cards.end(), pocket.begin(), pocket.end());
+
+	assert(cards.size() == 7);
+
+	hand = Judge::determineHand(cards);
+}
+
+bool Player::isBroke(money bigBlind) {
+	if (broke) return true;
+
+	if (wallet < bigBlind && !allIn) {
+		broke = true;
+	}
+
+	return broke;
 }

@@ -452,7 +452,7 @@ bool Holdem::checkEarlyEnd() {
 }
 
 void Holdem::checkBroke() {
-	if (players.at(humanPos)->isBroke()) {
+	if (players.at(humanPos)->isBroke(bBlind)) {
 		cout << endl;
 		cout << "You are broke!" << endl;
 		gameOver();
@@ -460,7 +460,7 @@ void Holdem::checkBroke() {
 
 	player_num num = 0;
 	while (num <= players.size()) {
-		if (players.at(num)->isBroke()) {
+		if (players.at(num)->isBroke(bBlind)) {
 			brokePlayers.push_back(players.at(num));
 			players.erase(players.begin()+num);
 		} else {

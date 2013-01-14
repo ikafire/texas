@@ -14,7 +14,7 @@ void Holdem::run() {
 	money budget;
 	bool retry;
 	do {
-		retry = setParams(budget);
+		retry = !setParams(budget);
 	} while (retry);
 
 	constructPlayers(budget);
@@ -55,8 +55,8 @@ void Holdem::startGame() {
 
 		playAgain = askContinue();
 		if (playAgain) {
-			checkBroke();
 			cleanUp();
+			checkBroke();
 		}
 	} while (playAgain);
 
