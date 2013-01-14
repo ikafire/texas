@@ -109,9 +109,16 @@ bool Holdem::setParams(money &budget) {
 }
 
 bool Holdem::betting(const Stage stage) {
-	player_num currentPos = (stage == PreFlop ? (dealer+3)%numOfPlayers : (dealer+1)%numOfPlayers);
-	player_num terminatePos = currentPos;
-
+	player_num currentPos, terminatePos;
+	
+	//mind special rule when num of player = 2
+	if (stage == PreFlop) {
+		currentPos = (numOfPlayers == 2 ? dealer : (dealer+3)%numOfPlayers);
+	} else {
+		currentPos = (dealer+1)%numOfPlayers;
+	}
+	terminatePos = currentPos;
+	
 	money raise = 0;
 	money pay = 0;
 	Player::Action act;
@@ -220,8 +227,14 @@ bool Holdem::preFlop() {
 	cout << "Small blind: " << players.at( (dealer+1) % numOfPlayers )->getName() << endl;
 	cout << "Big blind:   " << players.at( (dealer+2) % numOfPlayers )->getName() << endl;
 
-	players.at( (dealer+1) % numOfPlayers )->blind(sBlind);
-	players.at( (dealer+2) % numOfPlayers )->blind(bBlind);
+	//mind special rule when num of players = 2
+	if (numOfPlayers > 2) {
+		players.at( (dealer+1) % numOfPlayers )->blind(sBlind);
+		players.at( (dealer+2) % numOfPlayers )->blind(bBlind);
+	} else {
+		players.at(dealer)->blind(sBlind);
+		players.at( (dealer+1) % numOfPlayers )->blind(bBlind);
+	}
 	cout << endl;
 	cout << "Blind bet set." << endl;
 
@@ -469,6 +482,10 @@ void Holdem::checkBroke() {
 		} else {
 			++num;
 		}
+	}
+
+	if (players.size() <= 1) {
+		gameOver();
 	}
 
 	//set new numOfPlayers
