@@ -24,7 +24,7 @@ public:
 	bool isAllIn() const { return allIn; }
 	bool isFolded() const { return folded; }
 	std::string getName() const { return name; }
-	vector<Card> getPocket() const { return pocket; }
+	std::vector<Card> getPocket() const { return pocket; }
 
 	virtual Action generateAction(const GameStatus status, money &raise, money &pay) {
 		throw new std::exception("ERROR: generateAction() not implemented");

@@ -12,6 +12,7 @@ using std::endl;
 #include "GameStatus.h"
 #include "Card.h"
 #include "Stage.h"
+#include "PokerHand.h"
 
 bool Holdem::setParams(money &budget) {
 	//set number of players
@@ -102,9 +103,9 @@ bool Holdem::setParams(money &budget) {
 	throw new std::exception("ERROR: Holdem::setParams() ended in unexpected way");
 }
 
-void Holdem::betting(const player_num startPos, const Stage stage, const money minRaise) {
-	player_num currentPos = startPos % numOfPlayers;
-	player_num terminatePos = startPos % numOfPlayers;
+void Holdem::betting(const Stage stage) {
+	player_num currentPos = (stage == PreFlop ? (dealer+3)%numOfPlayers : (dealer+1)%numOfPlayers);
+	player_num terminatePos = currentPos;
 
 	money raise = 0;
 	money pay = 0;
@@ -112,8 +113,8 @@ void Holdem::betting(const player_num startPos, const Stage stage, const money m
 	GameStatus status;
 	status.community = community;
 	status.stage = stage;
-	status.minRaise = minRaise;
-	status.currentBet = minRaise;
+	status.minRaise = bBlind;
+	status.currentBet = (stage == PreFlop ? bBlind : 0);
 	status.pot = pot;
 
 	cout << "Current bet: " << status.currentBet << endl;
@@ -211,19 +212,79 @@ void Holdem::preFlop() {
 	players.at( (dealer+1) % numOfPlayers ).blind(sBlind);
 	players.at( (dealer+2) % numOfPlayers ).blind(bBlind);
 	cout << endl;
-	cout << "Blind bet set" << endl;
+	cout << "Blind bet set." << endl;
 
 	for (vector<Player>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
 		iter->receiveCards(deck.nextCard(), deck.nextCard());
 	}
-	vector<Card> pocket = players.at(humanPos).getPocket();
 	cout << endl;
-	cout << "Card dealt" << endl;
-	cout << pocket.at(0).toString() << ' ' << pocket.at(1).toString() << endl;
+	cout << "Card dealt." << endl;
 
 	cout << endl;
-	cout << "<Pre-flop>" << endl;
-	betting((dealer+3) % numOfPlayers, PreFlop, bBlind);
+	cout << "<Pre-flop Betting>" << endl;
+	betting(PreFlop);
 
 	stageResult();
 }
+
+void Holdem::flop() {
+	assert(community.size() == 0);
+
+	deck.nextCard();
+	community.push_back(deck.nextCard());
+	community.push_back(deck.nextCard());
+	community.push_back(deck.nextCard());
+	cout << endl;
+	cout << "Community card dealt: ";
+	for (vector<Card>::iterator iter = community.begin(); iter != community.end(); ++iter) {
+		cout << iter->toString() << ' ';
+	}
+	cout << endl;
+
+	cout << endl;
+	cout << "<Flop Betting>" << endl;
+	betting(Flop);
+
+	stageResult();
+}
+
+void Holdem::turn() {
+	assert(community.size() == 3);
+
+	deck.nextCard();
+	community.push_back(deck.nextCard());
+	cout << endl;
+	cout << "Community card dealt: " << community.at(3).toString() << endl;
+
+	cout << endl;
+	cout << "<Turn Betting>" << endl;
+	betting(Turn);
+
+	stageResult();
+}
+
+void Holdem::river() {
+	assert(community.size() == 4);
+
+	deck.nextCard();
+	community.push_back(deck.nextCard());
+	cout << endl;
+	cout << "Community card dealt: " << community.at(4).toString() << endl;
+
+	cout << endl;
+	cout << "<River Betting>" << endl;
+	betting(River);
+
+	stageResult();
+}
+
+//bool Holdem::showDown() {
+//	vector<Player*> competitors;
+//	vector<PokerHand> hands;
+//	for (vector<Player>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
+//		if (!iter->isFolded()) {
+//			competitors.push_back(&*iter);
+//		}
+//	}
+//
+//}

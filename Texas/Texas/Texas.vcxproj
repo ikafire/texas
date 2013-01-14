@@ -68,6 +68,7 @@
     <ClInclude Include="HumanPlayer.h" />
     <ClInclude Include="Judge.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PokerHand.h" />
     <ClInclude Include="Stage.h" />
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +81,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Holdem.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PokerHand.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
