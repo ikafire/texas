@@ -62,7 +62,7 @@ string PokerHand::toString()
 	}
 
 	string output = sstr.str() + hand[0].toString() + ' ' + hand[1].toString() + ' ' + hand[2].toString()
-					+ ' ' + hand[3].toString() + ' ' + hand[4].toString() + '\n';
+					+ ' ' + hand[3].toString() + ' ' + hand[4].toString();
 
 	return output;
 }

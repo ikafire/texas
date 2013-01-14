@@ -129,8 +129,6 @@ bool Holdem::betting(const Stage stage) {
 	status.currentBet = (stage == PreFlop ? bBlind : 0);
 	status.pot = pot;
 
-	cout << "Current bet: " << status.currentBet << endl;
-
 	do {
 		assert(status.pot == pot);	//change of status.pot must be done below
 
@@ -140,7 +138,7 @@ bool Holdem::betting(const Stage stage) {
 		Player &player = *players.at(currentPos);
 		//Note: check whether the player can do certain action or not is Player's job.
 		if (player.isFolded()) {
-			cout << player.getName() << " folded" << endl;
+			//empty
 		} else if (player.isAllIn()) {
 			cout << player.getName() << " all-in" << endl;
 		} else {
@@ -222,10 +220,16 @@ void Holdem::stageResult() {
 
 bool Holdem::preFlop() {
 	cout << endl;
+	cout << "Round " << roundNum << endl;
 	cout << "<Game Start>" << endl;
 	cout << "Dealer:      " << players.at(dealer)->getName() << endl;
-	cout << "Small blind: " << players.at( (dealer+1) % numOfPlayers )->getName() << endl;
-	cout << "Big blind:   " << players.at( (dealer+2) % numOfPlayers )->getName() << endl;
+	if (numOfPlayers>2) {
+		cout << "Small blind: " << players.at( (dealer+1) % numOfPlayers )->getName() << endl;
+		cout << "Big blind:   " << players.at( (dealer+2) % numOfPlayers )->getName() << endl;
+	} else {
+		cout << "Small blind: " << players.at(dealer)->getName() << endl;
+		cout << "Big blind:   " << players.at( (dealer+1) % numOfPlayers )->getName() << endl;
+	}
 
 	//mind special rule when num of players = 2
 	if (numOfPlayers > 2) {
@@ -235,13 +239,13 @@ bool Holdem::preFlop() {
 		players.at(dealer)->blind(sBlind);
 		players.at( (dealer+1) % numOfPlayers )->blind(bBlind);
 	}
+	pot += sBlind + bBlind;
 	cout << endl;
 	cout << "Blind bet set." << endl;
 
 	for (vector<Player*>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
 		(*iter)->receiveCards(deck.nextCard(), deck.nextCard());
 	}
-	cout << endl;
 	cout << "Card dealt." << endl;
 
 	cout << endl;
@@ -251,7 +255,7 @@ bool Holdem::preFlop() {
 
 	stageResult();
 
-	return false;
+	return checkEarlyEnd();
 }
 
 bool Holdem::flop() {
@@ -275,7 +279,7 @@ bool Holdem::flop() {
 
 	stageResult();
 
-	return false;
+	return checkEarlyEnd();
 }
 
 bool Holdem::turn() {
@@ -293,7 +297,7 @@ bool Holdem::turn() {
 
 	stageResult();
 
-	return false;
+	return checkEarlyEnd();
 }
 
 bool Holdem::river() {
@@ -311,7 +315,7 @@ bool Holdem::river() {
 
 	stageResult();
 
-	return false;
+	return checkEarlyEnd();
 }
 
 void Holdem::showDown() {
@@ -362,15 +366,11 @@ void Holdem::distributePot(deque< vector<Player*> > &ranks) {
 	//calculate side pots
 	while (playerBets.size() > 0) {
 		money tmpThres = playerBets.front();
-		sidePots.push_back(tmpThres * playerBets.size());
+		sidePots.push_back((tmpThres-(potThresholds.empty() ? 0 : potThresholds.back())) * playerBets.size());
 		potThresholds.push_back(tmpThres);
 		potTies.push_back(0);
-		//minus all bets (moved to the side pot)
-		for (deque<money>::iterator iter = playerBets.begin(); iter != playerBets.end(); ++iter) {
-			*iter -= tmpThres;
-		}
 		//trim
-		while (playerBets.front() == 0) {
+		while (!playerBets.empty() && playerBets.front() == potThresholds.back()) {
 			playerBets.pop_front();
 		}
 	}
@@ -383,7 +383,7 @@ void Holdem::distributePot(deque< vector<Player*> > &ranks) {
 		vector<Player*> &winners = ranks.front();
 		for (player_num num = 0; num != winners.size(); ++num) {
 			for (deque<money>::size_type potNum = 0; potNum != sidePots.size(); ++potNum) {
-				if (winners.at(num)->getTotalBet() > potThresholds.at(potNum)) {
+				if (winners.at(num)->getTotalBet() >= potThresholds.at(potNum)) {
 					++(potTies.at(potNum));
 				}
 			}
@@ -394,19 +394,18 @@ void Holdem::distributePot(deque< vector<Player*> > &ranks) {
 			Player *winner = winners.at(num);
 			money award = 0;
 			for (deque<money>::size_type potNum = 0; potNum != sidePots.size(); ++potNum) {
-				if (winner->getTotalBet() > potThresholds.at(potNum)) {
+				if (winner->getTotalBet() >= potThresholds.at(potNum)) {
 					assert(potTies.at(potNum) > 0);
 					award += sidePots.at(potNum) / potTies.at(potNum);
 					pot -= sidePots.at(potNum) / potTies.at(potNum);
 				}
 			}
 			winner->win(award);
-			cout << endl;
 			cout << winner->getName() << " won " << award << "!" << endl;
 		}
 
 		//discard distributed side pots
-		while (potTies.front() != 0) {
+		while (!potTies.empty() && potTies.front() != 0) {
 			sidePots.pop_front();
 			potThresholds.pop_front();
 			potTies.pop_front();
@@ -475,7 +474,7 @@ void Holdem::checkBroke() {
 
 	//kick broke players out of game
 	player_num num = 0;
-	while (num <= players.size()) {
+	while (num < players.size()) {
 		if (players.at(num)->isBroke(bBlind)) {
 			brokePlayers.push_back(players.at(num));
 			players.erase(players.begin()+num);
@@ -492,25 +491,23 @@ void Holdem::checkBroke() {
 	numOfPlayers = players.size();
 
 	//set new dealer pos
-	Player *newDealer;
+	Player *newDealer = oldDealer;
 	do {
-		//if old dealer still exist, position doesn't change
-		newDealer = *(std::find(players.begin(), players.end(), oldDealer));
-		if (newDealer == *players.end()) {
-			newDealer = 0;
-		}
-		//if old dealer is out of game, pick a player before him as new dealer (increment will be later)
-		//find his previous player
-		if (oldDealer != &*playerList.begin()) {
-			--oldDealer;
-		} else {
-			oldDealer = &*(playerList.end()-1);
-		}
-	} while (newDealer == 0);
-	//increment dealer pos
-	if (++newDealer == *players.end()) {
-		newDealer = *players.begin();
-	}
+		//find the player next to old dealer in playerList
+		//if (std::find(playerList.begin(), playerList.end(), oldDealer)+1 != playerList.end()) { //not last
+		//	newDealer = *(std::find(playerList.begin(), playerList.end(), newDealer)+1);
+		//} else { //last
+		//	newDealer = *(playerList.begin());
+		//}
+
+		//find index of newDealer
+		int index = std::find(playerList.begin(), playerList.end(), newDealer) - playerList.begin();
+		index = (index+1) % playerList.size();
+		newDealer = playerList.at(index);
+
+		assert(newDealer!=oldDealer); //prevent infinite loop
+	} while (std::find(players.begin(), players.end(), newDealer) == players.end());
+
 	//find index of dealer
 	vector<Player*>::iterator index = std::find(players.begin(), players.end(), newDealer);
 	dealer = index - players.begin();
@@ -531,6 +528,11 @@ void Holdem::gameOver() {
 	}
 	for (vector<Player*>::iterator iter = brokePlayers.begin(); iter != brokePlayers.end(); ++iter) {
 		cout << (*iter)->getName() << ": " << (*iter)->getWallet() << endl;
+	}
+
+	//delete players
+	for (vector<Player*>::iterator iter = playerList.begin(); iter != playerList.end(); ++iter) {
+		delete *iter;
 	}
 
 	system("pause");

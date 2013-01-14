@@ -2,10 +2,14 @@
 #define COMPLAYER_H
 
 #include "Player.h"
+#include "Judge.h"
+#include "GameStatus.h"
+
+#include <string>
 
 class ComPlayer : public Player {
 public:
-	enum Character {Radical, Normal, Calm};
+	enum Character {Radical, Normal, Coward};
 	ComPlayer(const money budget, const bool allowAllIn, std::string name) 
 		: Player(budget, allowAllIn, name) {}
 	virtual Action generateAction(const GameStatus status, money &raise, money &pay);
@@ -13,18 +17,19 @@ private:
 	Character character;
 	void setCharacter();
 	Character getCharacter() const {return character;}
+	
+	int confidence;
+	void setConfidence();
+	int getConfidence() const {return confidence;}
 
-	int strength;
-	void setStrength();
+	money calculateRaise(const GameStatus&) const;
+	void helpAccount(const money &pay);
 
-	void preflop(Action&, money &pay, money &raise, const GameStatus& );
-	int estimationPre();
-	void flop(Action&, money &pay, money &raise, const GameStatus& );
-	int estimationFlop();
-	void turn(Action&, money &pay, money &raise, const GameStatus& );
-	int estimationTurn();
-	void river(Action&, money &pay, money &raise, const GameStatus& );
-	int estimationRiver();
+	int estimationPre() const;
+	int estimationFlopAndTurn(const GameStatus&) const;
+	Action preflop(money &pay, money &raise, const GameStatus& );
+	Action flopAndTurn(money &pay, money &raise, const GameStatus& );
+	Action river(money &pay, money &raise, const GameStatus& );
 };
 
 #endif

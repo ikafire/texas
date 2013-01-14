@@ -1,6 +1,10 @@
 #include <vector>
 using std::vector;
 
+#include <sstream>
+using std::stringstream;
+
+#include <algorithm>
 #include "Holdem.h"
 #include "Player.h"
 #include "HumanPlayer.h"
@@ -8,6 +12,10 @@ using std::vector;
 #include "Deck.h"
 #include "Card.h"
 #include "PokerHand.h"
+
+Holdem::Holdem() {
+	pot = 0;
+}
 
 void Holdem::run() {
 	//set parameters
@@ -26,18 +34,16 @@ void Holdem::run() {
 void Holdem::constructPlayers(const money budget) {
 	for (player_num n = 0; n < numOfPlayers; ++n) {
 		if (n == humanPos) {
-			HumanPlayer hp(budget, allowAllIn, "You");
-			playerList.push_back(hp);
+			playerList.push_back(new HumanPlayer(budget, allowAllIn, "You"));
 		} else {
-			ComPlayer cp(budget, allowAllIn, "Com#"+n);
-			playerList.push_back(cp);
+			stringstream sstream;
+			sstream << "Com#" << n+1;
+			playerList.push_back(new ComPlayer(budget, allowAllIn, sstream.str()));
 		}
 	}
 
-	for (vector<Player>::iterator iter = playerList.begin(); iter != playerList.end(); ++iter) {
-		players.push_back(&*iter);
-	}
-
+	players = vector<Player*>(playerList);
+	
 	assert(players.size() == numOfPlayers);
 	assert(playerList.size() == numOfPlayers);
 }
@@ -82,6 +88,11 @@ vector<Player*> Holdem::highestHands(vector<Player*> &competitors) {
 		if (highestHand == competitors.at(num)->getHand()) {
 			highests.push_back(competitors.at(num));
 		}
+	}
+
+	//erase grouped competitors
+	for (vector<Player*>::iterator iter = highests.begin(); iter != highests.end(); ++iter) {
+		competitors.erase(std::find(competitors.begin(), competitors.end(), *iter));
 	}
 
 	return highests;

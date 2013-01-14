@@ -8,6 +8,8 @@
 #include "Deck.h"
 #include "Card.h"
 #include "Player.h"
+#include "ComPlayer.h"
+#include "HumanPlayer.h"
 #include "Stage.h"
 
 typedef unsigned money;
@@ -17,10 +19,11 @@ class Holdem {
 public:
 	const static player_num MIN_PLAYER = 2;
 	const static player_num MAX_PLAYER = 9;
+	Holdem();
 	void run();
 private:
 	Deck deck;
-	std::vector<Player> playerList;
+	std::vector<Player*> playerList;
 	std::vector<Player*> players;
 	std::vector<Player*> brokePlayers;
 	std::vector<Card> community;

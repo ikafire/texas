@@ -33,6 +33,7 @@ Player::Action HumanPlayer::generateAction(const GameStatus status, money &raise
 	cout << "Current bet: " << status.getCurrentBet() << endl;
 	cout << "Your last bet: " << stageBet << endl;
 	cout << "Your total bet in this round: " << totalBet << endl;
+	cout << "Your wallet: " << wallet << endl;
 	cout << "Pot: " << status.getPot() << endl;
 
 	Action act;
@@ -113,6 +114,10 @@ bool HumanPlayer::actionValid(Action act, const GameStatus &status, money &raise
 		cout << "Your bet doesn't match current bet, you cannot check." << endl;
 		return false;
 	case Call:
+		if (status.getCurrentBet() == stageBet) {
+			cout << "You should check." << endl;
+			return false;
+		}
 		if (wallet >= status.getCurrentBet() - stageBet) return true;
 		cout << "You don't have enough money to call." << endl;
 		return false;
