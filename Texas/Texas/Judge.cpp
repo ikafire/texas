@@ -1,5 +1,6 @@
 #include <vector>
 using std::vector;
+
 #include <cassert>
 #include "Judge.h"
 

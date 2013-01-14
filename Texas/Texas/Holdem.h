@@ -2,6 +2,7 @@
 #define HOLDEM_H
 
 #include <vector>
+#include <deque>
 #include <cassert>
 
 #include "Deck.h"
@@ -32,7 +33,7 @@ private:
 
 	void constructPlayers(const money budget);
 	void startGame();
-	vector<Player*> highestHands(vector<Player*> &competitors);
+	std::vector<Player*> highestHands(std::vector<Player*> &competitors);
 	void cleanUp();
 	//functions below are console-only
 	bool setParams(money &budget);
@@ -43,7 +44,7 @@ private:
 	bool showDown();
 	void betting(const Stage stage);
 	void stageResult();
-	void distributePot(vector< vector<Player*> > &ranks);
+	void distributePot(std::deque< std::vector<Player*> > &ranks);
 	void checkBroke();
 };
 

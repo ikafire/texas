@@ -300,7 +300,7 @@ bool Holdem::showDown() {
 	}
 
 	//grouping competitors with their Hands
-	vector< vector<Player*> > groups;
+	deque< vector<Player*> > groups;
 	do {
 		groups.push_back(highestHands(competitors));
 	} while (competitors.size() > 0);
@@ -327,7 +327,7 @@ bool Holdem::showDown() {
 	throw new std::exception("ERROR: Holdem::showDown() ended in unexpected way");
 }
 
-void Holdem::distributePot(vector< vector<Player*> > &ranks) {
+void Holdem::distributePot(deque< vector<Player*> > &ranks) {
 	assert(ranks.size() > 0);
 
 	//make bet list
@@ -399,7 +399,7 @@ void Holdem::distributePot(vector< vector<Player*> > &ranks) {
 			potThresholds.pop_front();
 			potTies.pop_front();
 		}
-		ranks.erase(ranks.begin());
+		ranks.pop_front();
 	}
 
 	//the rest of the pot goes to small blind player

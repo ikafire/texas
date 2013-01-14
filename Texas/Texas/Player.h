@@ -18,7 +18,7 @@ public:
 	void win(const money amount);
 	void nextStage();
 	void nextRound();
-	void calcHand(const vector<Card> &community);
+	void calcHand(const std::vector<Card> &community);
 
 	money getWallet() const { return wallet; }
 	money getStageBet() const { return stageBet; }

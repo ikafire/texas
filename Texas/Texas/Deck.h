@@ -9,7 +9,6 @@ class Deck {
 public:
 	Deck();
 	void reset();
-
 	//Warning: if you call nextCard() more than 52 times without calling reset(), it will throw exception
 	Card nextCard();
 private:

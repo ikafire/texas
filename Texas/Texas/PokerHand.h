@@ -2,9 +2,7 @@
 #define POKERHAND_H
 
 #include <vector>
-using std::vector;
 #include <string>
-using std::string;
 #include "Card.h"
 
 
@@ -14,7 +12,7 @@ public:
 	enum Order {EMPTY, HighCard, OnePair, TwoPairs, ThreeOfAKind, Straight, Flush, FullHouse, FourOfAKind, StraightFlush, RoyalStraightFlush};
 	
 	PokerHand(){};
-	PokerHand(const Order order, const vector<Card>& pickList);
+	PokerHand(const Order order, const std::vector<Card>& pickList);
 	Order getOrder() const;
 
 	bool operator== (const PokerHand& h) const;
@@ -24,11 +22,11 @@ public:
 	bool operator< (const PokerHand& h) const {return !((*this) >= h ); }
 	bool operator<=(const PokerHand& h) const {return !((*this) > h);}
 
-	string toString();
+	std::string toString();
 
 private:
 	Order order;
-	vector<Card> hand;
+	std::vector<Card> hand;
 };
 
 

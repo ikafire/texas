@@ -58,7 +58,7 @@ vector<Player*> Holdem::highestHands(vector<Player*> &competitors) {
 	assert(competitors.size() > 0);
 	
 	//pick the largest hand
-	PokerHand highestHand = competitors.at(0)->getHand();
+	PokerHand highestHand = competitors.front()->getHand();
 	PokerHand tmpHand;
 	for (player_num num = 1; num != competitors.size(); ++num) {
 		tmpHand = competitors.at(num)->getHand();

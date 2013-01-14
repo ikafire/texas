@@ -1,7 +1,11 @@
 #include <string>
 using std::string;
+
 #include <sstream>
 using std::stringstream;
+
+#include <vector>
+using std::vector;
 
 #include "PokerHand.h"
 
