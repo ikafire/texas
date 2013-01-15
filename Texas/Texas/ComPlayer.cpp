@@ -66,7 +66,7 @@ Player::Action ComPlayer::generateAction(const GameStatus status, money &raise, 
 	case Flop:		return flopAndTurn(pay, raise, status);		break;
 	case Turn:		return flopAndTurn(pay, raise, status);		break;
 	case River:		return river(pay, raise, status);			break;
-	default:		throw new std::exception("ERROR at ComPlayer::generateAction().");
+	default:		throw new std::exception();
 	}
 }
 
@@ -80,7 +80,7 @@ void ComPlayer::setCharacter()
 	else if (c > 0 && c < 5)
 		character = Normal;
 	else
-		throw new std::exception("ERROR at ComPlayer::setCharacter().");
+		throw new std::exception();
 }
 
 void ComPlayer::setConfidence()
@@ -90,7 +90,7 @@ void ComPlayer::setConfidence()
 	case Radical:	confidence = 100 + 10* (rand() % 91);	break;	//100~1000
 	case Normal:	confidence = 50 + 10* (rand() % 46);	break;	//50 ~500
 	case Coward:	confidence = 10 + 10* (rand() % 10);	break;	//10~100
-	default:	throw new std::exception("ERROR at ComPlayer::setStrengh().");
+	default:	throw new std::exception();
 	}
 }
 
@@ -119,15 +119,15 @@ money ComPlayer::calculateRaise(const GameStatus &status) const
 	{
 		raiseValid = false;
 		raise = 0;
-		loopCount++;
+		++loopCount;
 		if (loopCount > 50)
 		{
 			raiseUnit = raiseUnit / 10;
 			loopCount = 0;
-			reUnitTime++; 
+			++reUnitTime; 
 		}
 		if (reUnitTime > 2)
-			throw new std::exception("ERROR at ComPlayer::calculateRaise(): Loop over 100 times.");
+			throw new std::exception();
 
 		raise = status.getMinRaise() + raiseUnit * (confidence / 100) + raiseUnit * (rand() % 50); 
 
@@ -346,7 +346,7 @@ Player::Action ComPlayer::flopAndTurn (money& pay, money& raise, const GameStatu
 			return Call;
 		}
 		else
-			throw new std::exception("ERROR at ComPlayer::flopAndTurn(): Undefined condition.");
+			throw new std::exception();
 	}
 	else if (score >= 80)
 	{
@@ -374,7 +374,7 @@ Player::Action ComPlayer::flopAndTurn (money& pay, money& raise, const GameStatu
 			}
 		}
 		else
-			throw new std::exception("ERROR at ComPlayer::flopAndTurn(): Undefined condition.");
+			throw new std::exception();
 	}
 	else if (score >= 40)
 	{
@@ -395,7 +395,7 @@ Player::Action ComPlayer::flopAndTurn (money& pay, money& raise, const GameStatu
 			}
 		}
 		else
-			throw new std::exception("ERROR at ComPlayer::flopAndTurn(): Undefined condition.");
+			throw new std::exception();
 	}
 	else
 	{
@@ -416,7 +416,7 @@ Player::Action ComPlayer::flopAndTurn (money& pay, money& raise, const GameStatu
 			}
 		}
 		else
-			throw new std::exception("ERROR at ComPlayer::flopAndTurn(): Undefined condition.");
+			throw new std::exception();
 	}
 }
 
@@ -536,7 +536,7 @@ Player::Action ComPlayer::river(money& pay, money& raise, const GameStatus& stat
 			}
 		}
 		else
-			throw new std::exception("ERROR at ComPlayer::river(): Undefined strategy condition.");
+			throw new std::exception();
 	}
 	else if (pokerHand_Set > pokerHand_Pub)
 	{
@@ -563,7 +563,7 @@ Player::Action ComPlayer::river(money& pay, money& raise, const GameStatus& stat
 			}
 		}
 		else 
-			throw new std::exception("ERROR at ComPlayer::river(): Undefined strategy condition.");
+			throw new std::exception();
 	}
 	else if (pokerHand_Set == pokerHand_Pub)
 	{
@@ -582,7 +582,5 @@ Player::Action ComPlayer::river(money& pay, money& raise, const GameStatus& stat
 		}
 	}
 	else
-		throw new std::exception("ERROR at Player::Action ComPlayer::river(): Undefined order relation.");
+		throw new std::exception();
 }
-
-

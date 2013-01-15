@@ -33,8 +33,9 @@ void Player::receiveCards(Card c1, Card c2) {
 void Player::blind(const money amount) {
 	assert(!allIn && !folded);
 	assert(stageBet == 0 && totalBet == 0);
+	//the player should have enough money to make blind bet
 	if (wallet < amount) {
-		throw new std::exception("ERROR: not enough money to blind bet");
+		throw new std::exception();
 	}
 
 	wallet -= amount;
@@ -64,11 +65,13 @@ void Player::nextRound() {
 }
 
 void Player::calcHand(const vector<Card> &community) {
+	//combine community cards with pocket cards
 	vector<Card> cards(community);
 	cards.insert(cards.end(), pocket.begin(), pocket.end());
 
 	assert(cards.size() == 7);
 
+	//determine how high is his hand
 	hand = Judge::determineHand(cards);
 }
 

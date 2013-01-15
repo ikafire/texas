@@ -53,6 +53,7 @@ void Holdem::startGame() {
 	bool playAgain;
 	do {
 		do {
+			//at each stage, check for early end (all but one folded) and break if true
 			if (preFlop()) break;
 			if (flop()) break;
 			if (turn()) break;
@@ -73,7 +74,7 @@ void Holdem::startGame() {
 vector<Player*> Holdem::highestHands(vector<Player*> &competitors) {
 	assert(!competitors.empty());
 	
-	//pick the largest hand
+	//find the highest hand
 	PokerHand highestHand = competitors.front()->getHand();
 	PokerHand tmpHand;
 	for (player_num num = 1; num != competitors.size(); ++num) {
@@ -91,7 +92,7 @@ vector<Player*> Holdem::highestHands(vector<Player*> &competitors) {
 		}
 	}
 
-	//erase grouped competitors
+	//erase picked-out competitors
 	for (vector<Player*>::iterator iter = highests.begin(); iter != highests.end(); ++iter) {
 		competitors.erase(std::find(competitors.begin(), competitors.end(), *iter));
 	}

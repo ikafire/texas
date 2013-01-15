@@ -5,7 +5,10 @@
 #include <string>
 #include "Card.h"
 
-
+/*
+This class records the hand type made of 5 cards.
+And allow comparison between whether different or same hand types.
+*/
 class PokerHand
 {
 public:

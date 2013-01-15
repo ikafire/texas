@@ -105,17 +105,18 @@ bool Holdem::setParams(money &budget) {
 		}
 	} while (true);
 
-	throw new std::exception("ERROR: Holdem::setParams() ended in unexpected way");
+	throw new std::exception();
 }
 
 bool Holdem::betting(const Stage stage) {
-	if (gotoShowDown) {
+	if (gotoShowDown) { //if everyone (or all but one) are all-in, then no need to bet
 		return false;
 	}
 
 	player_num currentPos, terminatePos;
 	
-	//mind special rule when num of player = 2
+	//set betting start, end position
+	//Mind: special rule when num of player == 2
 	if (stage == PreFlop) {
 		currentPos = (numOfPlayers == 2 ? dealer : (dealer+3)%numOfPlayers);
 	} else {
@@ -123,6 +124,7 @@ bool Holdem::betting(const Stage stage) {
 	}
 	terminatePos = currentPos;
 	
+	//prepare GameStatus and other params
 	money raise = 0;
 	money pay = 0;
 	Player::Action act;
@@ -133,6 +135,7 @@ bool Holdem::betting(const Stage stage) {
 	status.currentBet = (stage == PreFlop ? bBlind : 0);
 	status.pot = pot;
 
+	//perform betting sequentially
 	do {
 		assert(status.pot == pot);	//change of status.pot must be done below
 
@@ -140,7 +143,7 @@ bool Holdem::betting(const Stage stage) {
 		if (checkEarlyEnd()) return true;
 
 		Player &player = *players.at(currentPos);
-		//Note: check whether the player can do certain action or not is Player's job.
+		//Note: check whether the player can or cannot do certain action is class:Player's job.
 		if (player.isFolded()) {
 			//empty
 		} else if (player.isAllIn()) {
@@ -175,8 +178,6 @@ bool Holdem::betting(const Stage stage) {
 				cout << player.getName() << " raised " << raise << ". Current bet: " << status.currentBet << endl;
 				break;
 			case Player::AllIn:
-				assert(player.getStageBet() >= status.currentBet);
-				assert(pay >= player.getStageBet() - status.currentBet);
 				assert(player.isAllIn());
 
 				if (player.getStageBet() >= status.currentBet + status.minRaise) { //all-in == raise
@@ -198,7 +199,7 @@ bool Holdem::betting(const Stage stage) {
 				cout << player.getName() << " just folded" << endl;
 				break;
 			default:
-				throw new std::exception("ERROR: player invalid action");
+				throw new std::exception();
 			}
 		}
 
@@ -214,7 +215,7 @@ void Holdem::stageResult() {
 	cout << "Pot: " << pot << endl;
 	cout << "Remaining players: ";
 	for (vector<Player*>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
-		(*iter)->nextStage();
+		(*iter)->nextStage(); //call player to prepare for next stage betting
 		if (!(*iter)->isFolded()) {
 			cout << (*iter)->getName() << ' ';
 		}
@@ -228,7 +229,10 @@ bool Holdem::preFlop() {
 	cout << endl;
 	cout << "Round " << roundNum << endl;
 	cout << "<Game Start>" << endl;
+
+	//printing special player position
 	cout << "Dealer:      " << players.at(dealer)->getName() << endl;
+	//Mind: annoying two-player special rule
 	if (numOfPlayers>2) {
 		cout << "Small blind: " << players.at( (dealer+1) % numOfPlayers )->getName() << endl;
 		cout << "Big blind:   " << players.at( (dealer+2) % numOfPlayers )->getName() << endl;
@@ -237,7 +241,8 @@ bool Holdem::preFlop() {
 		cout << "Big blind:   " << players.at( (dealer+1) % numOfPlayers )->getName() << endl;
 	}
 
-	//mind special rule when num of players = 2
+	//making blind bet
+	//Mind: annoying two-player special rule
 	if (numOfPlayers > 2) {
 		players.at( (dealer+1) % numOfPlayers )->blind(sBlind);
 		players.at( (dealer+2) % numOfPlayers )->blind(bBlind);
@@ -249,6 +254,7 @@ bool Holdem::preFlop() {
 	cout << endl;
 	cout << "Blind bet set." << endl;
 
+	//dealing 2 cards to each player
 	for (vector<Player*>::iterator iter = players.begin(); iter!=players.end(); ++iter) {
 		(*iter)->receiveCards(deck.nextCard(), deck.nextCard());
 	}
@@ -257,6 +263,7 @@ bool Holdem::preFlop() {
 	cout << endl;
 	cout << "<Pre-flop Betting>" << endl;
 
+	//betting
 	if (betting(PreFlop)) return true;
 
 	stageResult();
@@ -267,6 +274,7 @@ bool Holdem::preFlop() {
 bool Holdem::flop() {
 	assert(community.empty());
 
+	//dealing 3 community cards
 	deck.nextCard();
 	community.push_back(deck.nextCard());
 	community.push_back(deck.nextCard());
@@ -291,6 +299,7 @@ bool Holdem::flop() {
 bool Holdem::turn() {
 	assert(community.size() == 3);
 
+	//dealing 1 community card
 	deck.nextCard();
 	community.push_back(deck.nextCard());
 	cout << endl;
@@ -307,8 +316,11 @@ bool Holdem::turn() {
 }
 
 bool Holdem::river() {
+	//TODO this function is basically the same as turn(), maybe merge two functions?
+
 	assert(community.size() == 4);
 
+	//dealing 1 community card
 	deck.nextCard();
 	community.push_back(deck.nextCard());
 	cout << endl;
@@ -352,7 +364,7 @@ void Holdem::showDown() {
 void Holdem::distributePot(deque< vector<Player*> > &ranks) {
 	assert(!ranks.empty());
 
-	//make bet list
+	//make a list of each players' total bet
 	deque<money> playerBets;
 	money sum = 0;
 	for (vector<Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
@@ -419,7 +431,7 @@ void Holdem::distributePot(deque< vector<Player*> > &ranks) {
 		ranks.pop_front();
 	}
 
-	//the rest of the pot goes to small blind player
+	//the rest of the pot (roundings) goes to small blind player
 	Player &sbPlayer = *players.at( (dealer+1)%numOfPlayers );
 	sbPlayer.win(pot);
 	if (pot != 0) {
@@ -428,6 +440,8 @@ void Holdem::distributePot(deque< vector<Player*> > &ranks) {
 }
 
 bool Holdem::askContinue() {
+	//TODO convert this function to a more general return-ture-or-false function
+
 	cout << endl;
 	do {
 		cout << "Do you want to play another round? (y/n): ";
@@ -445,11 +459,11 @@ bool Holdem::askContinue() {
 		}
 	} while (true);
 
-	throw new std::exception("ERROR: Holdem::showDown() ended in unexpected way");
+	throw new std::exception();
 }
 
 bool Holdem::checkEarlyEnd() {
-	//calc how many player not folded
+	//calculate how many player not folded / all-in
 	player_num nFoldNum = 0;
 	player_num nAllInNum = 0;
 	Player *notFolded;
@@ -462,11 +476,12 @@ bool Holdem::checkEarlyEnd() {
 			++nAllInNum;
 		}
 	}
-
+	//if all (or all but one) players are all-in, skip betting
 	if (nAllInNum <= 1) {
 		gotoShowDown = true;
 	}
-	if (nFoldNum > 1) {	//if more than one player not folded
+	//if more than one players not folded, game goes on
+	if (nFoldNum > 1) {
 		return false;
 	}
 
@@ -478,6 +493,7 @@ bool Holdem::checkEarlyEnd() {
 }
 
 void Holdem::checkBroke() {
+	//check if human player is broke
 	if (players.at(humanPos)->isBroke(bBlind)) {
 		cout << endl;
 		cout << "You are broke!" << endl;
@@ -497,35 +513,30 @@ void Holdem::checkBroke() {
 		}
 	}
 
+	//if only one player is not broke, game over
 	if (players.size() <= 1) {
 		gameOver();
 	}
 
-	//set new numOfPlayers
 	numOfPlayers = players.size();
 
-	//set new dealer pos
+	//set new dealer position
 	Player *newDealer = oldDealer;
 	do {
-		//find the player next to old dealer in playerList
-		//if (std::find(playerList.begin(), playerList.end(), oldDealer)+1 != playerList.end()) { //not last
-		//	newDealer = *(std::find(playerList.begin(), playerList.end(), newDealer)+1);
-		//} else { //last
-		//	newDealer = *(playerList.begin());
-		//}
-
-		//find index of newDealer
+		//find newDealer (the player next to the old one in playerList)
 		int index = std::find(playerList.begin(), playerList.end(), newDealer) - playerList.begin();
 		index = (index+1) % playerList.size();
 		newDealer = playerList.at(index);
 
 		assert(newDealer!=oldDealer); //prevent infinite loop
+		//if newDealer is still not in game (i.e. is also broke), repeat
 	} while (std::find(players.begin(), players.end(), newDealer) == players.end());
 
-	//find index of dealer
+	//find index of new dealer
 	vector<Player*>::iterator index = std::find(players.begin(), players.end(), newDealer);
 	dealer = index - players.begin();
 
+	//print out remaining players
 	cout << endl;
 	cout << "Remaining players: ";
 	for (vector<Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
@@ -537,6 +548,7 @@ void Holdem::checkBroke() {
 void Holdem::gameOver() {
 	cout << endl;
 	cout << "Game Over!" << endl;
+	//print out each players' final score (money)
 	cout << "Result:" << endl;
 	for (vector<Player*>::iterator iter = playerList.begin(); iter != playerList.end(); ++iter) {
 		cout << (*iter)->getName() << ": " << (*iter)->getWallet() << endl;

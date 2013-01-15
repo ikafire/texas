@@ -13,16 +13,19 @@ using std::vector;
 
 Player::Action HumanPlayer::generateAction(const GameStatus status, money &raise, money &pay) {
 	assert(!allIn && !folded);
+	assert(stageBet <= status.getCurrentBet());
 	
 	cout << endl;
 	cout << "Your turn" << endl;
-
+	
+	//show player's cards
 	cout << "Your cards: ";
 	for (vector<Card>::iterator iter = pocket.begin(); iter != pocket.end(); ++iter) {
 		cout << iter->toString() << ' ';
 	}
 	cout << endl;
 
+	//show community cards
 	cout << "Communities: ";
 	vector<Card> com = status.getCommunity();
 	for (vector<Card>::iterator iter = com.begin(); iter != com.end(); ++iter) {
@@ -36,11 +39,13 @@ Player::Action HumanPlayer::generateAction(const GameStatus status, money &raise
 	cout << "Your wallet: " << wallet << endl;
 	cout << "Pot: " << status.getPot() << endl;
 
+	//get player's input and check its validity
 	Action act;
 	do {
 		act = getInput();
 	} while (!actionValid(act, status, raise));
 
+	//if action valid, respond and return it to class:Holdem
 	switch (act) {
 	case Check:
 		assert(status.getCurrentBet() == stageBet);
@@ -60,7 +65,6 @@ Player::Action HumanPlayer::generateAction(const GameStatus status, money &raise
 		wallet -= pay;
 		break;
 	case AllIn:
-		assert(wallet >= status.getCurrentBet() - stageBet);
 		pay = wallet;
 		stageBet += pay;
 		totalBet += pay;
@@ -71,7 +75,7 @@ Player::Action HumanPlayer::generateAction(const GameStatus status, money &raise
 		folded = true;
 		break;
 	default:
-		throw new std::exception("ERROR: HumanPlayer::generateAction found invalid Action");
+		throw new std::exception();
 	}
 
 	return act;
@@ -103,25 +107,29 @@ Player::Action HumanPlayer::getInput() {
 		}
 	}
 
-	throw new std::exception("ERROR: HumanPlayer::getInput() ended in unexpected way");
+	throw new std::exception();
 }
 
 bool HumanPlayer::actionValid(Action act, const GameStatus &status, money &raise) {
 	money maxRaise;
 	switch (act) {
 	case Check:
+		//to check, the player's last bet must match the current bet on table
 		if (status.getCurrentBet() == stageBet) return true;
 		cout << "Your bet doesn't match current bet, you cannot check." << endl;
 		return false;
 	case Call:
+		//if the player's last bet matches the current bet on table, he should check instead of call
 		if (status.getCurrentBet() == stageBet) {
 			cout << "You should check." << endl;
 			return false;
 		}
+		//to call, the player must have enough money (current bet - player's last bet)
 		if (wallet >= status.getCurrentBet() - stageBet) return true;
 		cout << "You don't have enough money to call." << endl;
 		return false;
 	case Raise:
+		//to raise, the player must have enough money (current bet + minimum raise - player's last bet)
 		if (wallet < status.getCurrentBet() + status.getMinRaise() - stageBet) {
 			cout << "Your don't have enough money to raise." << endl;
 			return false;
@@ -139,12 +147,10 @@ bool HumanPlayer::actionValid(Action act, const GameStatus &status, money &raise
 			cout << "You cannot all-in in this game." << endl;
 			return false;
 		}
-		if (wallet >= status.getCurrentBet() - stageBet) return true;
-		cout << "You don't have enough money." << endl;
-		return false;
+		return true;
 	case Fold:
 		return true;
 	default:
-		throw new std::exception("ERROR: HumanPlayer::actionValid found invalid Action");
+		throw new std::exception();
 	}
 }

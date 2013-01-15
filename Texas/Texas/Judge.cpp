@@ -23,7 +23,7 @@ PokerHand Judge::determineHand(vector<Card>& cardSet)
 void Judge::sortCardSet(vector<Card>& cardSet)
 {
 	Card insert;
-	for (size_t next = 1; next < cardSet.size(); next++)
+	for (size_t next = 1; next < cardSet.size(); ++next)
 	{
 		insert = cardSet[next];
 		int moveItem = next;
@@ -36,8 +36,8 @@ void Judge::sortCardSet(vector<Card>& cardSet)
 		cardSet[moveItem] = insert;
 	}
 
-	for (size_t index = 0; index < cardSet.size() - 1; index++)
-		for (size_t compare = 1; index + compare < cardSet.size() ; compare++)
+	for (size_t index = 0; index < cardSet.size() - 1; ++index)
+		for (size_t compare = 1; index + compare < cardSet.size() ; ++compare)
 			if (cardSet[index].getValue() == cardSet[index + compare].getValue() && cardSet[index].getSuit() < cardSet[index + compare].getSuit())
 			{
 				Card temp = cardSet[index];
@@ -50,13 +50,13 @@ vector<int> Judge::countValues (const vector<Card>& cardSet)
 {
 	vector<int> valueCount(14);
 
-	for (size_t  index = 0; index < cardSet.size(); index++)
-		for (int value = 1; value <= 13; value++)
+	for (size_t  index = 0; index < cardSet.size(); ++index)
+		for (int value = 1; value <= 13; ++value)
 			if (cardSet[index].getValue() == value)
-				valueCount[value]++;
+				++valueCount[value];
 	
 	int total = 0;
-	for (int value = 1; value <= 13; value++)
+	for (int value = 1; value <= 13; ++value)
 		total = total + valueCount[value];
 
 	assert(total == cardSet.size());
@@ -73,7 +73,7 @@ vector<int> Judge::countTable(const vector<int>& valueCount)
 {
 	int total = 0;
 	vector<int> countTable(5);
-	for (int value = 1; value <= 13; value++)
+	for (int value = 1; value <= 13; ++value)
 	{
 		total = total + valueCount[value];
 		switch (valueCount[value])
@@ -83,7 +83,7 @@ vector<int> Judge::countTable(const vector<int>& valueCount)
 		case 2:	countTable[2]++;	break;
 		case 3: countTable[3]++;	break;
 		case 4: countTable[4]++;	break;
-		default:	throw new std::exception("ERROR at value count table.");
+		default:	throw new std::exception();
 		}
 	}
 	
@@ -124,7 +124,7 @@ vector<int> Judge::countSuits (const vector<Card>& cardSet)
 		case Card::Diamond: suitCount[2]++;		break;
 		case Card::Heart:	suitCount[3]++;		break;
 		case Card::Spade:	suitCount[4]++;		break;
-		default: throw new std::exception("ERROR at suit count process.");
+		default: throw new std::exception();
 		}
 	}
 	
@@ -235,7 +235,7 @@ PokerHand::Order Judge::orderAnalysis (const vector<Card>& cardSet, const vector
 	if (countList[0] == 1)
 		return PokerHand::HighCard;
 
-	throw new std::exception("ERROR at Judge::orderAnalysis.");
+	throw new std::exception();
 }
 
 vector<Card> Judge::pickHand(PokerHand::Order order, const vector<Card>& cardSet, const vector<int>& valueCount, const vector<int>& suitCount, const vector<int>& lengthTag)
@@ -370,7 +370,7 @@ vector<Card> Judge::pickHand(PokerHand::Order order, const vector<Card>& cardSet
 			valueOfHouse = tempValueOfHouse[0];
 		}
 		else
-			throw new std::exception("ERROR at Judge::pickHand() of Full House.");
+			throw new std::exception();
 
 		for (size_t index = 0; index < cardSet.size(); index++)
 			if (cardSet[index].getValue() == valueOfFull)
@@ -441,7 +441,7 @@ vector<Card> Judge::pickHand(PokerHand::Order order, const vector<Card>& cardSet
 					}
 		}
 		else
-			throw new std::exception("ERROR at Judge::pickHand() of Straight.");
+			throw new std::exception();
 		
 		break;
 		}
@@ -583,7 +583,7 @@ vector<Card> Judge::pickHand(PokerHand::Order order, const vector<Card>& cardSet
 		break;
 		}
 	default:
-		throw new std::exception("ERROR at Judge::pickHand(): default order selection.");
+		throw new std::exception();
 	}
 
 	assert(pickList.size() == 5);

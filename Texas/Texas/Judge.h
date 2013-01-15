@@ -5,6 +5,11 @@
 #include "PokerHand.h"
 #include "Card.h"
 
+/*
+This is a static tool-like class, whose main purpose is to receive 7 cards 
+and determine its hand type (determineHand()).
+Other functions are called by class:ComPlayer (AI).
+*/
 class Judge
 {
 public:
@@ -17,7 +22,7 @@ public:
 	static PokerHand::Order orderAnalysis (const std::vector<Card>& cardSet, const std::vector<int>& countList, const std::vector<int>& suitCount, const std::vector<int>& lengthTag);
 
 private:
-	//TODO: finish computer strategy
+	//TODO finish computer strategy
 	static std::vector<Card> pickHand (PokerHand::Order, const std::vector<Card>& cardSet, const std::vector<int>& valueCount, const std::vector<int>& suitCount, const std::vector<int>& lengthTag);
 };
 

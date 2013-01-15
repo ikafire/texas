@@ -7,11 +7,17 @@
 
 #include <string>
 
+/* 
+Inherited from class:Player, this is the AI part.
+Its only function (other than constructor) to be called by outside is generateAction(), which returns AI's decision to Call, Fold, Check, etc..
+*/
 class ComPlayer : public Player {
 public:
-	enum Character {Radical, Normal, Coward};
+	enum Character { Radical, Normal, Coward };
+
 	ComPlayer(const money budget, const bool allowAllIn, std::string name) 
 		: Player(budget, allowAllIn, name) {}
+
 	virtual Action generateAction(const GameStatus status, money &raise, money &pay);
 private:
 	Character character;

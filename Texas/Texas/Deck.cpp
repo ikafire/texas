@@ -4,7 +4,7 @@ using std::string;
 #include <vector>
 using std::vector;
 
-#include <random>
+#include <cstdlib>
 using std::srand;
 using std::rand;
 
@@ -16,6 +16,7 @@ using std::time;
 #include "Card.h"
 
 Deck::Deck() {
+	//construct 52 cards
 	for (int s=1; s<=4; ++s) {
 		for (int v=1; v<=13; ++v) {
 			Card::Suit suit;
@@ -30,6 +31,7 @@ Deck::Deck() {
 			isTaken.push_back(false);
 		}
 	}
+
 	srand(time(0));
 	cardDealt = 0;
 
@@ -43,10 +45,10 @@ void Deck::reset() {
 	cardDealt = 0;
 }
 
-//Warning: if you call nextCard() more than 52 times without calling reset(), it will throw exception
+//Warning: if call nextCard() more than 52 times without calling reset(), it will throw exception
 Card Deck::nextCard() {
 	if (cardDealt >= NUM_OF_CARDS) {
-		throw new std::exception("ERROR: more than 52 cards are dealt.");
+		throw new std::exception();
 	}
 
 	int nextPos;

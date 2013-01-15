@@ -13,7 +13,6 @@ Card::Card() {
 }
 
 Card::Card(const int value,const Suit suit) {
-	//check if card is invalid in debug mode
 	assert(value > 0 && value <= 13);
 	assert(suit == Card::Club || suit == Card::Diamond || suit == Card::Heart || suit == Card::Spade);
 
@@ -38,7 +37,7 @@ string Card::toString() const {
 		sstr << 'S';
 		break;
 	default:
-		throw new std::exception("ERROR: toString() called on empty Card");
+		throw new std::exception();
 	}
 
 	if (value >=2 && value <= 10) {
@@ -50,7 +49,7 @@ string Card::toString() const {
 		case 12: sstr << 'Q'; break;
 		case 13: sstr << 'K'; break;
 		default:
-			throw new std::exception("ERROR: Card value out of range");
+			throw new std::exception();
 		}
 	}
 

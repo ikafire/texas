@@ -10,9 +10,7 @@ using std::vector;
 #include "PokerHand.h"
 
 PokerHand::PokerHand(const Order o, const vector<Card>& pickList)
-	:order(o), hand(pickList)
-{
-}
+	:order(o), hand(pickList) { }
 
 PokerHand::Order PokerHand::getOrder() const
 {
@@ -57,7 +55,7 @@ string PokerHand::toString()
 		sstr<< "High Card: ";
 		break;
 	default:
-		throw new std::exception("ERROR at PokerHand::toString()");
+		throw new std::exception();
 		break;
 	}
 
@@ -84,7 +82,7 @@ bool PokerHand::operator== (const PokerHand& h) const
 		return ((*this).hand[0].getValue() == h.hand[0].getValue() && (*this).hand[4].getValue() == h.hand[4].getValue() );
 	case Flush:
 		{
-			for (int i = 0; i <= 4 ; i++)
+			for (int i = 0; i <= 4 ; ++i)
 				if ((*this).hand[i].getValue() != h.hand[i].getValue())
 					return false;
 
@@ -129,14 +127,14 @@ bool PokerHand::operator== (const PokerHand& h) const
 		}
 	case HighCard:
 		{
-			for (int i = 0; i <= 4 ; i++)
+			for (int i = 0; i <= 4 ; ++i)
 				if ((*this).hand[i].getValue() != h.hand[i].getValue())
 					return false;
 
 			return true;
 		}
 	default:
-		throw new std::exception("ERROR at operator==().");
+		throw new std::exception();
 	}//end switch
 }//end bool PokerHand::operator==(PokerHand& h)
 
@@ -194,7 +192,7 @@ bool PokerHand::operator>(const PokerHand& h) const
 			}
 
 			else
-				for (int i = 1; i <= 4; i++)
+				for (int i = 1; i <= 4; ++i)
 					if ((*this).hand[i].getValue() != h.hand[i].getValue())
 						return ((*this).hand[i].getValue() > h.hand[i].getValue());
 
@@ -204,7 +202,7 @@ bool PokerHand::operator>(const PokerHand& h) const
 		return (*this).hand[4].getValue() > h.hand[4].getValue();
 	case ThreeOfAKind:
 		{
-			for (int i = 0; i <= 4; i++)
+			for (int i = 0; i <= 4; ++i)
 			{
 				if (i == 1 || i == 2)
 					continue;
@@ -223,7 +221,7 @@ bool PokerHand::operator>(const PokerHand& h) const
 		}
 	case TwoPairs:
 		{
-			for (int i = 0; i <= 4; i++)
+			for (int i = 0; i <= 4; ++i)
 			{
 				if (i == 1 || i == 3)
 					continue;
@@ -242,7 +240,7 @@ bool PokerHand::operator>(const PokerHand& h) const
 		}
 	case OnePair:
 		{
-			for (int i = 0; i <= 4; i++)
+			for (int i = 0; i <= 4; ++i)
 			{
 				if (i == 1)
 					continue;
@@ -272,13 +270,13 @@ bool PokerHand::operator>(const PokerHand& h) const
 			}
 
 			else
-				for (int i = 1; i <= 4; i++)
+				for (int i = 1; i <= 4; ++i)
 					if ((*this).hand[i].getValue() != h.hand[i].getValue())
 						return ((*this).hand[i].getValue() > h.hand[i].getValue());
 
 			return false;
 		}
 	default:
-		throw new std::exception("ERROR at operator>().");
+		throw new std::exception();
 	}//end switch
 }//end bool PokerHand::operator>(PokerHand& h)
