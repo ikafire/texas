@@ -502,6 +502,7 @@ Player::Action ComPlayer::river(money& pay, money& raise, const GameStatus& stat
 			else
 			{
 				pay = wallet;
+				helpAccount(pay);
 				raise = pay - status.getCurrentBet() + stageBet;
 				return Raise;
 			}
