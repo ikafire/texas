@@ -37,6 +37,19 @@ public:
 	std::vector<Card> getPocket() const { return pocket; }
 	PokerHand getHand() const { return hand; }
 
+	/*
+	A pure virtual function, meant to be overridden by HumanPlayer and ComPlayer.
+	It should generate betting Action and return it to Holdem.
+	In addition to returning Action, it uses reference parameters to return additional information.
+	raise: shows how much it would like to raise when returning Raise.
+	pay: shows how much it should pay, whether its Call, Raise or AllIn.
+	Whether an Action is valid or not must be checked here, returning an invalid Action to Holdem will cause throwing of exception.
+	(example: when minimum raise is 50, raising only 20 is invalid.
+	          when Check is valid, Call is invalid.
+	          when you don't have enough money, calling is invalid.
+			  when the game doesn't allow all-in, All-in is invalid.
+			  ...etc.)
+	*/
 	virtual Action generateAction(const GameStatus status, money &raise, money &pay) = 0;
 protected:
 
